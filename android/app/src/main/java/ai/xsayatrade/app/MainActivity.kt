@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -26,6 +25,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.WindowCompat
+import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewFeature
@@ -132,7 +132,7 @@ class MainActivity : Activity() {
             settings.javaScriptCanOpenWindowsAutomatically = false
             settings.setSupportMultipleWindows(false)
             // Use AndroidX feature detection so OEM WebView providers without safe browsing remain compatible.
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING)) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ENABLE)) {
                 WebSettingsCompat.setSafeBrowsingEnabled(settings, true)
             }
             webChromeClient = WebChromeClient()
@@ -180,7 +180,7 @@ class MainActivity : Activity() {
             return !isBundled && !isConfiguredBackend
         }
 
-        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceErrorCompat) {
             super.onReceivedError(view, request, error)
             if (request.isForMainFrame && view === webView) {
                 showLoadError(error.errorCode)
