@@ -40,3 +40,33 @@ jobs:
           name: vexon-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+  startup-smoke-test:
+    needs: debug-apk
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [23, 35]
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: vexon-debug-apk
+          path: apk
+      - name: Install and launch on Android API ${{ matrix.api-level }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: default
+          arch: x86_64
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb install -r apk/app-debug.apk
+            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity
+            sleep 8
+            adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -q 'ai.vexon.app.debug'
+            if adb logcat -d -t 1500 | grep -A8 'FATAL EXCEPTION' | grep -q 'ai.vexon.app.debug'; then
+              adb logcat -d -t 1500
+              exit 1
+            fi
