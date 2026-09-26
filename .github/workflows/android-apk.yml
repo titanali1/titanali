@@ -44,7 +44,8 @@ jobs:
       - name: Report Gradle failure details
         if: failure() && steps.build-apk.outcome == 'failure'
         run: |
-          details="$(tail -n 24 "$RUNNER_TEMP/android-build.log")"
+          details="$(grep -E -A5 -B2 'FAILURE:|What went wrong:|^e: |error:|Unresolved reference|Could not resolve|Could not find|Execution failed|Caused by:' "$RUNNER_TEMP/android-build.log" | tail -n 26)"
+          if [ -z "$details" ]; then details="$(tail -n 24 "$RUNNER_TEMP/android-build.log")"; fi
           details=${details//'%'/'%25'}
           details=${details//$'\r'/'%0D'}
           details=${details//$'\n'/'%0A'}
