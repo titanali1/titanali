@@ -25,6 +25,7 @@ import androidx.core.view.WindowCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewFeature
+import androidx.webkit.WebViewClientCompat
 import java.io.ByteArrayInputStream
 
 class MainActivity : Activity() {
@@ -95,7 +96,7 @@ class MainActivity : Activity() {
         if (view.url.isNullOrBlank()) loadAppUrl()
     }
 
-    private fun createWebViewClient() = object : WebViewClient() {
+    private fun createWebViewClient() = object : WebViewClientCompat() {
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
             val uri = request.url
             if (uri.host == "appassets.androidplatform.net" && uri.path?.startsWith("/api/") == true) {

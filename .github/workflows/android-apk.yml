@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [28, 35]
+        api-level: [23, 35]
     steps:
       - uses: actions/download-artifact@v5
         with:
@@ -60,23 +60,26 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: default
           arch: x86_64
+          working-directory: ${{ github.workspace }}
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
           script: |
+            LOG="$GITHUB_WORKSPACE/android-startup-logcat.txt"
+            LAUNCH="$GITHUB_WORKSPACE/android-launch.txt"
             adb logcat -c
-            if ! adb install -r apk/app-debug.apk; then
-              adb logcat -d -v threadtime -t 3000 > android-startup-logcat.txt
-              cat android-startup-logcat.txt
+            if ! adb install -r "$GITHUB_WORKSPACE/apk/app-debug.apk"; then
+              adb logcat -d -v threadtime -t 3000 > "$LOG" || true
+              cat "$LOG" || true
               exit 1
             fi
-            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity > android-launch.txt 2>&1 || true
-            cat android-launch.txt
+            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity > "$LAUNCH" 2>&1 || true
+            cat "$LAUNCH" || true
             sleep 8
             APP_PID="$(adb shell pidof ai.vexon.app.debug 2>/dev/null | tr -d '\r' || true)"
+            adb logcat -d -v threadtime -t 3000 > "$LOG" || true
             if [ -z "$APP_PID" ]; then
-              adb logcat -d -v threadtime -t 3000 > android-startup-logcat.txt
-              cat android-startup-logcat.txt
-              FAILURE="$(grep -E -m1 'FATAL EXCEPTION|Caused by:|Fatal signal' android-startup-logcat.txt | tr -d '\r' || true)"
+              cat "$LOG" || true
+              FAILURE="$(grep -E -m1 'FATAL EXCEPTION|Caused by:|Fatal signal' "$LOG" | tr -d '\r' || true)"
               echo "::error title=Android app exited::${FAILURE:-The app process exited shortly after launch.}"
               exit 1
             fi
@@ -86,5 +89,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-startup-log-api-${{ matrix.api-level }}
-          path: android-startup-logcat.txt
+          path: ${{ github.workspace }}/android-startup-logcat.txt
           if-no-files-found: ignore
