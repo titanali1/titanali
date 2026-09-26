@@ -3,6 +3,8 @@ package ai.vexon.app
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -20,12 +22,15 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.WindowCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebViewClientCompat
+import androidx.webkit.WebViewCompat
 import java.io.ByteArrayInputStream
 
 class MainActivity : Activity() {
@@ -35,18 +40,69 @@ class MainActivity : Activity() {
     private var rendererRestartAttempted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installCrashReporter()
         super.onCreate(savedInstanceState)
         try {
             WindowCompat.setDecorFitsSystemWindows(window, true)
             window.statusBarColor = Color.rgb(11, 16, 24)
             window.navigationBarColor = Color.rgb(11, 16, 24)
             window.decorView.systemUiVisibility = 0
+            val previousCrash = readPreviousCrash()
+            if (previousCrash != null) {
+                showFallback("گزارش توقف قبلی ذخیره شد", previousCrash, allowRetry = true)
+                return
+            }
             safelyOpenApp(savedInstanceState)
         } catch (failure: RuntimeException) {
             showStartupError(failure)
         } catch (failure: LinkageError) {
             showStartupError(failure)
         }
+    }
+
+    private fun installCrashReporter() {
+        val previousHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, failure ->
+            try {
+                val report = buildCrashReport(thread, failure)
+                openFileOutput("vexon-last-crash.txt", MODE_PRIVATE).use { it.write(report.toByteArray(Charsets.UTF_8)) }
+            } catch (_: Throwable) {
+                // Preserve the platform's crash handling if local diagnostics cannot be written.
+            }
+            if (previousHandler != null) {
+                previousHandler.uncaughtException(thread, failure)
+            } else {
+                android.os.Process.killProcess(android.os.Process.myPid())
+                kotlin.system.exitProcess(10)
+            }
+        }
+    }
+
+    private fun buildCrashReport(thread: Thread, failure: Throwable): String = buildString {
+        appendLine("Vexon startup/runtime crash report")
+        appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
+        appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
+        appendLine("Thread: ${thread.name}")
+        appendLine("WebView: ${webViewProviderVersion()}")
+        appendLine("Exception: ${failure.javaClass.name}: ${failure.message}")
+        appendLine(android.util.Log.getStackTraceString(failure).take(12000))
+    }
+
+    private fun readPreviousCrash(): String? = try {
+        openFileInput("vexon-last-crash.txt").bufferedReader(Charsets.UTF_8).use { it.readText().take(12000) }
+    } catch (_: Exception) {
+        null
+    }
+
+    private fun clearPreviousCrash() {
+        try { deleteFile("vexon-last-crash.txt") } catch (_: Exception) { }
+    }
+
+    private fun webViewProviderVersion(): String = try {
+        val provider = WebViewCompat.getCurrentWebViewPackage(this)
+        if (provider == null) "unavailable" else "${provider.packageName} ${provider.versionName}"
+    } catch (failure: Throwable) {
+        "unavailable (${failure.javaClass.simpleName})"
     }
 
     private fun safelyOpenApp(savedInstanceState: Bundle?) {
@@ -171,9 +227,10 @@ class MainActivity : Activity() {
     }
 
     private fun showStartupError(error: Throwable) {
+        android.util.Log.e("Vexon", "App startup failed", error)
         showFallback(
             "برنامه نتوانست شروع شود",
-            "خطای سازگاری (${error.javaClass.simpleName}). Android System WebView یا Chrome را به‌روز کنید و دوباره تلاش کنید."
+            "خطای سازگاری: ${error.javaClass.name}: ${error.message ?: "بدون توضیح"}\n\nAndroid System WebView یا Chrome را به‌روز کنید و دوباره تلاش کنید."
         )
     }
 
@@ -189,7 +246,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
             layoutDirection = View.LAYOUT_DIRECTION_RTL
-            setPadding(32, 32, 32, 32)
+            setPadding(24, 24, 24, 24)
             setBackgroundColor(Color.rgb(11, 16, 24))
         }
         val heading = TextView(this).apply {
@@ -200,22 +257,42 @@ class MainActivity : Activity() {
         }
         val message = TextView(this).apply {
             text = detail
-            textSize = 14f
+            textSize = 13f
             setTextColor(Color.rgb(160, 174, 184))
-            gravity = Gravity.CENTER
+            gravity = Gravity.START
+            setTextIsSelectable(true)
             setPadding(0, 20, 0, 20)
         }
+        val scroll = ScrollView(this).apply { addView(message) }
         content.addView(heading, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-        content.addView(message, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        content.addView(scroll, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+        val copy = Button(this).apply {
+            text = "کپی گزارش فنی"
+            setOnClickListener {
+                val report = buildString {
+                    appendLine("Vexon diagnostic report")
+                    appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
+                    appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
+                    appendLine("WebView: ${webViewProviderVersion()}")
+                    appendLine("Screen: $title")
+                    appendLine(detail)
+                }
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("Vexon diagnostics", report))
+                Toast.makeText(this@MainActivity, "گزارش فنی کپی شد؛ آن را برای پشتیبانی بفرستید.", Toast.LENGTH_LONG).show()
+            }
+        }
+        content.addView(copy, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         if (allowRetry) {
             val retry = Button(this).apply {
                 text = "تلاش دوباره"
                 setOnClickListener {
+                    clearPreviousCrash()
                     rendererRestartAttempted = false
                     safelyOpenApp(null)
                 }
             }
-            content.addView(retry, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            content.addView(retry, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         }
         setContentView(content)
     }
