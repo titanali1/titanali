@@ -38,10 +38,6 @@ class MainActivity : Activity() {
         window.navigationBarColor = Color.rgb(11, 16, 24)
         window.decorView.systemUiVisibility = 0
 
-        assetLoader = WebViewAssetLoader.Builder()
-            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
-            .build()
-
         safelyOpenApp(savedInstanceState)
     }
 
@@ -58,6 +54,11 @@ class MainActivity : Activity() {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun attachWebView(savedInstanceState: Bundle?) {
+        if (!::assetLoader.isInitialized) {
+            assetLoader = WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+                .build()
+        }
         val view = WebView(this).apply {
             setBackgroundColor(Color.rgb(11, 16, 24))
             settings.javaScriptEnabled = true
