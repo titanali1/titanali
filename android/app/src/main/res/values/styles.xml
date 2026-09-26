@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.Vexon" parent="android:style/Theme.Material.NoActionBar">
+    <style name="Theme.XsayaTrade" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:colorAccent">#69E2BA</item>
         <item name="android:navigationBarColor">#0B1018</item>

@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Vexon"
+rootProject.name = "XsayaTrade"
 include(":app")

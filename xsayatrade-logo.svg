@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+<title id="title">XsayaTrade — Crypto and Gold Trading</title>
+<desc id="desc">A dark navy trading app icon with a bitcoin and gold-bar shield, turquoise upward chart arrow, and XsayaTrade wordmark.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#183a50"/><stop offset=".52" stop-color="#10283d"/><stop offset="1" stop-color="#081323"/></linearGradient>
+  <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4367ff"/><stop offset=".52" stop-color="#8470ff"/><stop offset="1" stop-color="#4262ff"/></linearGradient>
+  <linearGradient id="cyan" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#1eb4d0"/><stop offset=".52" stop-color="#36eff0"/><stop offset="1" stop-color="#a2ffff"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4a0"/><stop offset=".38" stop-color="#ffd945"/><stop offset=".72" stop-color="#f4a900"/><stop offset="1" stop-color="#ffe782"/></linearGradient>
+  <radialGradient id="glow"><stop stop-color="#34d8e8" stop-opacity=".34"/><stop offset="1" stop-color="#34d8e8" stop-opacity="0"/></radialGradient>
+  <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1024" height="1024" fill="#02040a"/>
+<rect x="42" y="42" width="940" height="940" rx="154" fill="url(#bg)" stroke="url(#frame)" stroke-width="18"/>
+<rect x="59" y="59" width="906" height="906" rx="139" fill="none" stroke="#5d8be2" stroke-opacity=".24" stroke-width="5"/>
+<circle cx="505" cy="445" r="375" fill="url(#glow)"/>
+<!-- subtle market grid -->
+<g stroke="#56cbdc" stroke-opacity=".12" stroke-width="3">
+  <path d="M115 500H909M115 580H909M115 660H909M205 240V710M365 210V710M525 205V710M685 210V710M845 240V710"/>
+  <path d="M130 625 265 540 350 575 460 438 555 487 692 354 790 390 895 290" fill="none" stroke="#44bddd" stroke-opacity=".18" stroke-width="5"/>
+</g>
+<g fill="#45d6e7" fill-opacity=".18">
+  <circle cx="166" cy="598" r="7"/><circle cx="264" cy="540" r="7"/><circle cx="352" cy="575" r="7"/><circle cx="460" cy="438" r="7"/><circle cx="555" cy="487" r="7"/><circle cx="692" cy="354" r="7"/><circle cx="790" cy="390" r="7"/><circle cx="895" cy="290" r="7"/>
+</g>
+<!-- shield -->
+<path d="M508 172 720 287v171c0 132-86 225-212 285-126-60-212-153-212-285V287z" fill="#0a1a2a" fill-opacity=".8" stroke="#47dae4" stroke-opacity=".85" stroke-width="13"/>
+<path d="M508 174 720 289" fill="none" stroke="url(#gold)" stroke-width="15"/>
+<path d="M296 288 508 174v569" fill="none" stroke="url(#gold)" stroke-width="12" stroke-opacity=".92"/>
+<!-- bitcoin mark -->
+<text x="378" y="474" font-family="DejaVu Sans, Arial, sans-serif" font-size="206" font-weight="700" fill="url(#gold)" stroke="#b47b08" stroke-width="2">₿</text>
+<!-- rising arrow / chart -->
+<path d="M245 624 363 504 437 565 560 423 617 473 754 318" fill="none" stroke="#0a738d" stroke-width="69" stroke-linecap="square" stroke-linejoin="miter" opacity=".9"/>
+<path d="M245 624 363 504 437 565 560 423 617 473 754 318" fill="none" stroke="url(#cyan)" stroke-width="48" stroke-linecap="square" stroke-linejoin="miter" filter="url(#softGlow)"/>
+<path d="m706 307 94-24-23 95-23-42-48 47-41-41 47-48z" fill="url(#cyan)" stroke="#9fffff" stroke-width="8" stroke-linejoin="round"/>
+<!-- gold bullion -->
+<g stroke="#ffef9a" stroke-width="8" stroke-linejoin="round">
+  <path d="m526 593 153-87 119 47-161 94z" fill="#ffe985"/>
+  <path d="m526 593 111 54-3 128-143-75z" fill="#d99a13"/>
+  <path d="m637 647 161-94v120l-164 102z" fill="url(#gold)"/>
+  <path d="m526 593 153-87 119 47-161 94z" fill="none" stroke="#fff6bd" stroke-opacity=".8"/>
+</g>
+<!-- wordmark -->
+<text x="512" y="858" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="79" font-weight="800" letter-spacing="2" fill="#f7fbff">XSAYATRADE</text>
+<text x="512" y="917" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="32" font-weight="400" letter-spacing="1.2" fill="#9eb3c6">Crypto &amp; Gold Trading</text>
+</svg>

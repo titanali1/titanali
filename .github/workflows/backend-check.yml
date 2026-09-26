@@ -1,4 +1,4 @@
-name: Vexon backend checks
+name: XsayaTrade backend checks
 
 on:
   push:

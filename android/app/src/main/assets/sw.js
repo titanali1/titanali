@@ -1,5 +1,5 @@
-const CACHE = 'vexon-static-v7';
-const CORE = ['/', '/index.html', '/styles.css', '/exchange.css', '/extra.css', '/backend-ui.css', '/i18n.css', '/app.js', '/i18n.js', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'xsayatrade-static-v8';
+const CORE = ['/', '/index.html', '/styles.css', '/exchange.css', '/extra.css', '/backend-ui.css', '/i18n.css', '/app.js', '/i18n.js', '/manifest.webmanifest', '/icon.svg', '/xsayatrade-logo-192.png', '/xsayatrade-logo-512.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))));
 self.addEventListener('fetch', event => {

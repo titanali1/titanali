@@ -1,4 +1,4 @@
-name: Build Vexon Android APK
+name: Build XsayaTrade Android APK
 
 on:
   workflow_dispatch:
@@ -15,6 +15,9 @@ on:
       - 'app.js'
       - 'sw.js'
       - 'icon.svg'
+      - 'manifest.webmanifest'
+      - 'xsayatrade-logo.png'
+      - 'xsayatrade-logo-*.png'
       - '.github/workflows/android-apk.yml'
 
 jobs:
@@ -37,6 +40,6 @@ jobs:
         run: gradle --no-daemon :app:assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: vexon-debug-apk
+          name: xsayatrade-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

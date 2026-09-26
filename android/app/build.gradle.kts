@@ -7,11 +7,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        val backendUrl = providers.gradleProperty("vexonBackendUrl").orElse("").get()
+        val backendUrl = providers.gradleProperty("xsayatradeBackendUrl").orElse(providers.gradleProperty("vexonBackendUrl")).orElse("").get()
         val escapedBackendUrl = backendUrl.replace("\\", "\\\\").replace("\"", "\\\"")
         buildConfigField("String", "VEXON_BACKEND_URL", "\"$escapedBackendUrl\"")
         applicationId = "ai.vexon.app"
-        minSdk = 23
+        minSdk = 21
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -38,15 +38,15 @@ android {
     }
 }
 
-val syncVexonWebAssets by tasks.registering(Copy::class) {
+val syncXsayaTradeWebAssets by tasks.registering(Copy::class) {
     from(rootProject.projectDir.parentFile) {
-        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "sw.js")
+        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "xsayatrade-logo-192.png", "xsayatrade-logo-512.png", "sw.js")
     }
     into(layout.projectDirectory.dir("src/main/assets"))
 }
 
 tasks.named("preBuild") {
-    dependsOn(syncVexonWebAssets)
+    dependsOn(syncXsayaTradeWebAssets)
 }
 
 dependencies {

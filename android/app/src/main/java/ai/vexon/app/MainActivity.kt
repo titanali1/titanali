@@ -79,7 +79,7 @@ class MainActivity : Activity() {
     }
 
     private fun buildCrashReport(thread: Thread, failure: Throwable): String = buildString {
-        appendLine("Vexon startup/runtime crash report")
+        appendLine("XsayaTrade startup/runtime crash report")
         appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
         appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
         appendLine("Thread: ${thread.name}")
@@ -227,7 +227,7 @@ class MainActivity : Activity() {
     }
 
     private fun showStartupError(error: Throwable) {
-        android.util.Log.e("Vexon", "App startup failed", error)
+        android.util.Log.e("XsayaTrade", "App startup failed", error)
         showFallback(
             "برنامه نتوانست شروع شود",
             "خطای سازگاری: ${error.javaClass.name}: ${error.message ?: "بدون توضیح"}\n\nAndroid System WebView یا Chrome را به‌روز کنید و دوباره تلاش کنید."
@@ -270,7 +270,7 @@ class MainActivity : Activity() {
             text = "کپی گزارش فنی"
             setOnClickListener {
                 val report = buildString {
-                    appendLine("Vexon diagnostic report")
+                    appendLine("XsayaTrade diagnostic report")
                     appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
                     appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                     appendLine("WebView: ${webViewProviderVersion()}")
@@ -278,7 +278,7 @@ class MainActivity : Activity() {
                     appendLine(detail)
                 }
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("Vexon diagnostics", report))
+                clipboard.setPrimaryClip(ClipData.newPlainText("XsayaTrade diagnostics", report))
                 Toast.makeText(this@MainActivity, "گزارش فنی کپی شد؛ آن را برای پشتیبانی بفرستید.", Toast.LENGTH_LONG).show()
             }
         }
