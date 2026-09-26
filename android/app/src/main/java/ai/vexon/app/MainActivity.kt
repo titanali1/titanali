@@ -22,7 +22,9 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.WindowCompat
+import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewFeature
 import java.io.ByteArrayInputStream
 
 class MainActivity : Activity() {
@@ -33,12 +35,17 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, true)
-        window.statusBarColor = Color.rgb(11, 16, 24)
-        window.navigationBarColor = Color.rgb(11, 16, 24)
-        window.decorView.systemUiVisibility = 0
-
-        safelyOpenApp(savedInstanceState)
+        try {
+            WindowCompat.setDecorFitsSystemWindows(window, true)
+            window.statusBarColor = Color.rgb(11, 16, 24)
+            window.navigationBarColor = Color.rgb(11, 16, 24)
+            window.decorView.systemUiVisibility = 0
+            safelyOpenApp(savedInstanceState)
+        } catch (failure: RuntimeException) {
+            showStartupError(failure)
+        } catch (failure: LinkageError) {
+            showStartupError(failure)
+        }
     }
 
     private fun safelyOpenApp(savedInstanceState: Bundle?) {
@@ -67,9 +74,9 @@ class MainActivity : Activity() {
             settings.allowContentAccess = false
             settings.javaScriptCanOpenWindowsAutomatically = false
             settings.setSupportMultipleWindows(false)
-            // Safe browsing was added in API 26; referencing it on API 23–25 crashes at runtime.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                settings.safeBrowsingEnabled = true
+            // Use AndroidX feature detection so OEM WebView providers without safe browsing remain compatible.
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING)) {
+                WebSettingsCompat.setSafeBrowsingEnabled(settings, true)
             }
             webChromeClient = WebChromeClient()
             webViewClient = createWebViewClient()

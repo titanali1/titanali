@@ -44,6 +44,7 @@ jobs:
   startup-smoke-test:
     needs: debug-apk
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -63,13 +64,20 @@ jobs:
           disable-animations: true
           script: |
             adb logcat -c
-            adb install -r apk/app-debug.apk
-            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity
-            sleep 8
-            APP_PID="$(adb shell pidof ai.vexon.app.debug | tr -d '\r')"
-            if [ -z "$APP_PID" ]; then
-              adb logcat -d -t 3000 > android-startup-logcat.txt
+            if ! adb install -r apk/app-debug.apk; then
+              adb logcat -d -v threadtime -t 3000 > android-startup-logcat.txt
               cat android-startup-logcat.txt
+              exit 1
+            fi
+            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity > android-launch.txt 2>&1 || true
+            cat android-launch.txt
+            sleep 8
+            APP_PID="$(adb shell pidof ai.vexon.app.debug 2>/dev/null | tr -d '\r' || true)"
+            if [ -z "$APP_PID" ]; then
+              adb logcat -d -v threadtime -t 3000 > android-startup-logcat.txt
+              cat android-startup-logcat.txt
+              FAILURE="$(grep -E -m1 'FATAL EXCEPTION|Caused by:|Fatal signal' android-startup-logcat.txt | tr -d '\r' || true)"
+              echo "::error title=Android app exited::${FAILURE:-The app process exited shortly after launch.}"
               exit 1
             fi
             echo "Vexon stayed alive after launch (PID $APP_PID) on API ${{ matrix.api-level }}."
