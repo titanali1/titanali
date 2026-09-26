@@ -36,18 +36,18 @@ test('secure API uses sessions, CSRF, encrypted-vault config and fail-closed tra
   const port = await freePort();
   base = `http://127.0.0.1:${port}`;
   const alternateOrigin = `http://localhost:${port}`;
-  dataDir = await mkdtemp(path.join(os.tmpdir(), 'vexon-test-'));
+  dataDir = await mkdtemp(path.join(os.tmpdir(), 'xsayatrade-test-'));
   const backendEnv = {
     ...process.env,
     NODE_ENV: 'development', HOST: '0.0.0.0', PORT: String(port),
-    VEXON_ALLOWED_ORIGINS: base,
-    VEXON_MANAGEABLE_ORIGINS: `${base},${alternateOrigin}`,
-    VEXON_ADMIN_USERNAME: 'test-admin',
-    VEXON_ADMIN_PASSWORD: 'test-only-password-928374!',
-    VEXON_MASTER_KEY: randomBytes(32).toString('hex'),
-    VEXON_DATA_DIR: dataDir,
-    VEXON_ENABLE_EXCHANGE_CONNECTIONS: 'false',
-    VEXON_LIVE_TRADING: 'false'
+    XSAYATRADE_ALLOWED_ORIGINS: base,
+    XSAYATRADE_MANAGEABLE_ORIGINS: `${base},${alternateOrigin}`,
+    XSAYATRADE_ADMIN_USERNAME: 'test-admin',
+    XSAYATRADE_ADMIN_PASSWORD: 'test-only-password-928374!',
+    XSAYATRADE_MASTER_KEY: randomBytes(32).toString('hex'),
+    XSAYATRADE_DATA_DIR: dataDir,
+    XSAYATRADE_ENABLE_EXCHANGE_CONNECTIONS: 'false',
+    XSAYATRADE_LIVE_TRADING: 'false'
   };
   child = spawn(process.execPath, ['server.js'], { cwd: process.cwd(), env: backendEnv, stdio: 'ignore' });
   t.after(async () => {

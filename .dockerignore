@@ -1,9 +1,10 @@
 .git
 node_modules
 android
-.vexon-data
+.xsayatrade-data
 .env
 .env.*
 !.env.example
 *.apk
 *.aab
+.vexon-data/

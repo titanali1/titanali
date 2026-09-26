@@ -6,7 +6,7 @@ XsayaTrade is a Persian/English trading-dashboard prototype with a native Androi
 
 ```bash
 cp .env.example .env
-# Set a unique admin password and generate VEXON_MASTER_KEY with: openssl rand -hex 32
+# Set a unique admin password and generate XSAYATRADE_MASTER_KEY with: openssl rand -hex 32
 npm install
 npm run dev
 ```
@@ -16,28 +16,28 @@ Open `http://localhost:8787`. Node.js 22 or newer is required. The default confi
 ## Security controls in the backend
 
 - One fixed admin username with no public signup. On first run, bootstrap credentials come from the environment; only a salted scrypt password hash is persisted. The admin password can be changed in Management, after which all sessions are revoked. Login attempts are rate-limited, and sessions use short-lived HttpOnly, SameSite cookies with CSRF-token checks. Remove the bootstrap password from the environment after initializing the persistent admin account.
-- Exchange API keys are verified server-side and encrypted at rest with AES-256-GCM. The 32-byte master key is environment-provided; the encrypted vault lives in `.vexon-data/` (permissions 0700/0600). Back it up securely with the matching key.
+- Exchange API keys are verified server-side and encrypted at rest with AES-256-GCM. The 32-byte master key is environment-provided; the encrypted vault lives in `.xsayatrade-data/` (permissions 0700/0600). Back it up securely with the matching key.
 - No withdrawal endpoint exists. Create exchange keys with only read and spot-trading permissions, and explicitly disable withdrawals at the exchange.
 - The signed-in administrator can lock individual app features and issue expiring, use-limited access codes from **Settings → Server & password management → Feature locks & access codes**. Code hashes are HMAC-stored server-side; the raw code is returned for display once. Anonymous feature unlocks receive a feature-scoped, signed HttpOnly cookie; lock changes and code revocations invalidate existing grants. Locked features prompt for a code and link to `https://t.me/dmj74`. Treat code delivery as a separate secure step.
 - Live orders are **off by default**. If deliberately enabled, the backend accepts spot **limit** orders only, checks market availability, quote-currency caps, available balance, amount precision and limit-price deviation, applies a request rate limit, records an audit event, and reserves idempotency keys before sending. Market orders and automated trading are not enabled.
 - The CCXT adapter checks capabilities and verifies credentials by reading balance before encrypting them. With the currently pinned CCXT release, Binance, OKX and KuCoin have compatible adapters; Nobitex, Wallex and Bitpin are reported unavailable and disabled in the UI. Do not enter Iranian-exchange credentials until their official adapters are implemented and reviewed.
-- Production requires explicit allowed hosts/origins and a trusted HTTPS reverse proxy. Do not expose the Node process directly to the public internet. Keep `.vexon-data` on a protected persistent volume. A non-root Node 22 Docker image is provided; bind its port only to loopback behind TLS termination.
+- Production requires explicit allowed hosts/origins and a trusted HTTPS reverse proxy. Do not expose the Node process directly to the public internet. Keep `.xsayatrade-data` on a protected persistent volume. A non-root Node 22 Docker image is provided; bind its port only to loopback behind TLS termination.
 
-On first start, configure `VEXON_ADMIN_USERNAME` and a unique `VEXON_ADMIN_PASSWORD`; these bootstrap the fixed administrator account once. After confirming the account file exists in the persistent data volume, remove the bootstrap password from the environment. The Management screen supports password changes and server-origin selection. Domain choices must first be added to `VEXON_MANAGEABLE_ORIGINS`; selecting one changes the backend host/origin allowlist but does not create DNS records, TLS certificates, or reverse-proxy routes. Keep the Android `xsayatradeBackendUrl` (the legacy `vexonBackendUrl` property is also accepted) build setting aligned with the deployed domain.
+On first start, configure `XSAYATRADE_ADMIN_USERNAME` and a unique `XSAYATRADE_ADMIN_PASSWORD`; these bootstrap the fixed administrator account once. After confirming the account file exists in the persistent data volume, remove the bootstrap password from the environment. The Management screen supports password changes and server-origin selection. Domain choices must first be added to `XSAYATRADE_MANAGEABLE_ORIGINS`; selecting one changes the backend host/origin allowlist but does not create DNS records, TLS certificates, or reverse-proxy routes. Keep the Android `xsayatradeBackendUrl` build setting aligned with the deployed domain.
 
-Before enabling production connections, configure `VEXON_MASTER_KEY`, `VEXON_ALLOWED_HOSTS`, `VEXON_ALLOWED_ORIGINS`, `VEXON_DATA_DIR`, and `VEXON_ENABLE_EXCHANGE_CONNECTIONS`. Keep `VEXON_LIVE_TRADING=false` while validating each exchange in its sandbox or with read-only API keys. `VEXON_ORDER_QUOTE_LIMITS` is a JSON map of quote currency to maximum per-order notional (default: 100 USDT); set a conservative limit for every allowed quote currency before live use.
+Before enabling production connections, configure `XSAYATRADE_MASTER_KEY`, `XSAYATRADE_ALLOWED_HOSTS`, `XSAYATRADE_ALLOWED_ORIGINS`, `XSAYATRADE_DATA_DIR`, and `XSAYATRADE_ENABLE_EXCHANGE_CONNECTIONS`. Keep `XSAYATRADE_LIVE_TRADING=false` while validating each exchange in its sandbox or with read-only API keys. `XSAYATRADE_ORDER_QUOTE_LIMITS` is a JSON map of quote currency to maximum per-order notional (default: 100 USDT); set a conservative limit for every allowed quote currency before live use.
 
 ### Docker deployment outline
 
-After creating a protected environment file outside the repository and provisioning HTTPS at a reverse proxy:
+After creating a protected environment file outside the repository and provisioning HTTPS at a reverse proxy, keep the existing Docker volume name if it already contains encrypted credentials:
 
 ```bash
 docker build -t xsayatrade-backend .
 docker run -d --name xsayatrade --restart unless-stopped \
   --env-file /secure/path/xsayatrade.env \
-  -e VEXON_DATA_DIR=/data \
+  -e XSAYATRADE_DATA_DIR=/data \
   -p 127.0.0.1:8787:8787 \
-  --mount source=xsayatrade-data,target=/data \
+  --mount source=vexon-data,target=/data \
   xsayatrade-backend
 ```
 
@@ -45,7 +45,7 @@ In the production env file set the exact public hostname and HTTPS origin. Keep 
 
 ## Android APK
 
-The Android Studio project is in `android/` (Gradle project name `XsayaTrade`). Open that folder and build `:app:assembleDebug` with JDK 17, Android SDK 35, and Gradle 8.11.1. Android `minSdk` is 21 (Android 5.0); this is a broad compatibility target, not a guarantee for every device or vendor WebView. The original application ID `ai.vexon.app` is intentionally retained so installed builds can be upgraded in place. To connect the APK to a deployed HTTPS backend, pass `-PxsayatradeBackendUrl=https://trade.example.com` to Gradle; without it, the APK opens the bundled demo and backend routes remain unavailable. The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`. The GitHub Actions workflow `.github/workflows/android-apk.yml` builds the APK artifact. The APK is a client shell; it does not bundle server credentials or enable real trading. If an uncaught Java crash occurs, the app stores a short diagnostic locally (device model, Android/WebView versions and stack trace); on the next launch it displays a copy button. No crash report is automatically sent. Android emulator smoke tests and physical-device/vendor-WebView coverage are not currently available in CI, so test the generated APK on your target devices before distribution. The `dmj74` mark is an in-app attribution, not an Android signing certificate; publishing a release APK requires the owner’s private keystore.
+The Android Studio project is in `android/` (Gradle project name `XsayaTrade`). Open that folder and build `:app:assembleDebug` with JDK 17, Android SDK 35, and Gradle 8.11.1. Android `minSdk` is 21 (Android 5.0); this is a broad compatibility target, not a guarantee for every device or vendor WebView. The new application ID is `ai.xsayatrade.app`. It is intentionally different from the old `ai.vexon.app`; Android treats it as a fresh app, so remove the old app from the device before or after installing this build. To connect the APK to a deployed HTTPS backend, pass `-PxsayatradeBackendUrl=https://trade.example.com` to Gradle; without it, the APK opens the bundled demo and backend routes remain unavailable. The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`. The GitHub Actions workflow `.github/workflows/android-apk.yml` builds the APK artifact. The APK is a client shell; it does not bundle server credentials or enable real trading. If an uncaught Java crash occurs, the app stores a short diagnostic locally (device model, Android/WebView versions and stack trace); on the next launch it displays a copy button. No crash report is automatically sent. Android emulator smoke tests and physical-device/vendor-WebView coverage are not currently available in CI, so test the generated APK on your target devices before distribution. The `dmj74` mark is an in-app attribution, not an Android signing certificate; publishing a release APK requires the owner’s private keystore.
 
 
-Branding and compatibility note: Android display name, adaptive/legacy launcher icons, PWA metadata and web assets use XsayaTrade. Existing `VEXON_*` backend environment variables and `.vexon-data` storage paths remain unchanged to avoid breaking configured deployments; the Android package ID is also retained for upgrade compatibility.
+Branding note: the Android namespace/application ID, app label, web/PWA, backend package, configuration names, cookies, and data directory now use XsayaTrade. Rename existing backend environment keys from `VEXON_*` to `XSAYATRADE_*` when deploying this version, keeping the existing master-key value exactly unchanged so the encrypted credential vault remains readable. On a local install, if `.vexon-data` exists and `.xsayatrade-data` does not, startup moves the data directory in place so the encrypted vault and administrator record are retained. Existing Android app installs cannot be deleted remotely by this repository; uninstall `ai.vexon.app` (and, if present, `ai.vexon.app.debug`) manually from Android Settings or with ADB before installing the new package. With ADB, run `adb uninstall ai.vexon.app` and, if the debug build is installed, `adb uninstall ai.vexon.app.debug`. Removing the old app deletes its local app data.

@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { createReadStream, promises as fs } from 'node:fs';
+import { createReadStream, existsSync, renameSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -9,17 +9,24 @@ import {
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
-const secureCookies = isProduction || process.env.VEXON_COOKIE_SECURE === 'true';
+const secureCookies = isProduction || process.env.XSAYATRADE_COOKIE_SECURE === 'true';
 const port = Number(process.env.PORT || 8787);
 const host = process.env.HOST || '0.0.0.0';
-const bootstrapAdminName = process.env.VEXON_ADMIN_USERNAME || '';
-const bootstrapAdminPassword = process.env.VEXON_ADMIN_PASSWORD || '';
-const masterKeyHex = process.env.VEXON_MASTER_KEY || '';
-const dataDir = path.resolve(process.env.VEXON_DATA_DIR || path.join(ROOT, '.vexon-data'));
-const connectionsEnabled = process.env.VEXON_ENABLE_EXCHANGE_CONNECTIONS === 'true';
-const liveTradingEnabled = process.env.VEXON_LIVE_TRADING === 'true';
-const allowedExchanges = new Set((process.env.VEXON_ALLOWED_EXCHANGES || 'binance,okx,kucoin,nobitex,wallex,bitpin').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
-const orderLimits = parseOrderLimits(process.env.VEXON_ORDER_QUOTE_LIMITS || '{"USDT":100}');
+const bootstrapAdminName = process.env.XSAYATRADE_ADMIN_USERNAME || '';
+const bootstrapAdminPassword = process.env.XSAYATRADE_ADMIN_PASSWORD || '';
+const masterKeyHex = process.env.XSAYATRADE_MASTER_KEY || '';
+const defaultDataDir = path.join(ROOT, '.xsayatrade-data');
+const legacyDataDir = path.join(ROOT, '.vexon-data');
+let requestedDataDir = path.resolve(process.env.XSAYATRADE_DATA_DIR || defaultDataDir);
+if ((requestedDataDir === defaultDataDir || requestedDataDir === legacyDataDir) && existsSync(legacyDataDir) && !existsSync(defaultDataDir)) {
+  renameSync(legacyDataDir, defaultDataDir);
+  requestedDataDir = defaultDataDir;
+}
+const dataDir = requestedDataDir;
+const connectionsEnabled = process.env.XSAYATRADE_ENABLE_EXCHANGE_CONNECTIONS === 'true';
+const liveTradingEnabled = process.env.XSAYATRADE_LIVE_TRADING === 'true';
+const allowedExchanges = new Set((process.env.XSAYATRADE_ALLOWED_EXCHANGES || 'binance,okx,kucoin,nobitex,wallex,bitpin').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
+const orderLimits = parseOrderLimits(process.env.XSAYATRADE_ORDER_QUOTE_LIMITS || '{"USDT":100}');
 const FEATURES = [
   { id: 'aiAnalysis', label: 'AI assistant' },
   { id: 'exchangeConnections', label: 'Exchange connections' },
@@ -29,11 +36,11 @@ const FEATURES = [
   { id: 'activityExport', label: 'Activity export' }
 ];
 const featureIds = new Set(FEATURES.map(feature => feature.id));
-const maxLimitDeviation = Number(process.env.VEXON_MAX_LIMIT_DEVIATION_PERCENT || 2);
-if (!Number.isFinite(maxLimitDeviation) || maxLimitDeviation <= 0 || maxLimitDeviation > 10) throw new Error('VEXON_MAX_LIMIT_DEVIATION_PERCENT must be between 0 and 10.');
-const allowedHosts = new Set((process.env.VEXON_ALLOWED_HOSTS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
-const allowedOrigins = new Set((process.env.VEXON_ALLOWED_ORIGINS || '').split(',').map(x => x.trim()).filter(Boolean));
-const manageableOrigins = new Set((process.env.VEXON_MANAGEABLE_ORIGINS || process.env.VEXON_ALLOWED_ORIGINS || '').split(',').map(x => x.trim()).filter(Boolean));
+const maxLimitDeviation = Number(process.env.XSAYATRADE_MAX_LIMIT_DEVIATION_PERCENT || 2);
+if (!Number.isFinite(maxLimitDeviation) || maxLimitDeviation <= 0 || maxLimitDeviation > 10) throw new Error('XSAYATRADE_MAX_LIMIT_DEVIATION_PERCENT must be between 0 and 10.');
+const allowedHosts = new Set((process.env.XSAYATRADE_ALLOWED_HOSTS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean));
+const allowedOrigins = new Set((process.env.XSAYATRADE_ALLOWED_ORIGINS || '').split(',').map(x => x.trim()).filter(Boolean));
+const manageableOrigins = new Set((process.env.XSAYATRADE_MANAGEABLE_ORIGINS || process.env.XSAYATRADE_ALLOWED_ORIGINS || '').split(',').map(x => x.trim()).filter(Boolean));
 for (const origin of [...allowedOrigins, ...manageableOrigins]) {
   const parsed = new URL(origin);
   if (parsed.origin !== origin || !(parsed.protocol === 'https:' || (!isProduction && ['localhost','127.0.0.1'].includes(parsed.hostname)))) throw new Error(`Invalid approved origin: ${origin}`);
@@ -47,12 +54,12 @@ function parseOrderLimits(raw) {
   try {
     const parsed = JSON.parse(raw);
     return new Map(Object.entries(parsed).map(([quote, value]) => [quote.toUpperCase(), Number(value)]).filter(([, value]) => Number.isFinite(value) && value > 0));
-  } catch { throw new Error('VEXON_ORDER_QUOTE_LIMITS must be a JSON object of quote currency limits.'); }
+  } catch { throw new Error('XSAYATRADE_ORDER_QUOTE_LIMITS must be a JSON object of quote currency limits.'); }
 }
 function requireConfig() {
-  if (!/^[a-f\d]{64}$/i.test(masterKeyHex)) throw new Error('Configure VEXON_MASTER_KEY as 64 hexadecimal characters (32 random bytes).');
+  if (!/^[a-f\d]{64}$/i.test(masterKeyHex)) throw new Error('Configure XSAYATRADE_MASTER_KEY as 64 hexadecimal characters (32 random bytes).');
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid PORT.');
-  if (isProduction && (!allowedHosts.size || !allowedOrigins.size)) throw new Error('Production requires explicit VEXON_ALLOWED_HOSTS and VEXON_ALLOWED_ORIGINS.');
+  if (isProduction && (!allowedHosts.size || !allowedOrigins.size)) throw new Error('Production requires explicit XSAYATRADE_ALLOWED_HOSTS and XSAYATRADE_ALLOWED_ORIGINS.');
 }
 requireConfig();
 const masterKey = Buffer.from(masterKeyHex, 'hex');
@@ -102,7 +109,7 @@ function parseCookies(header = '') {
   }
   return result;
 }
-function cookieName() { return secureCookies ? '__Host-vexon_session' : 'vexon_session'; }
+function cookieName() { return secureCookies ? '__Host-xsayatrade_session' : 'xsayatrade_session'; }
 function cookieValue(token, maxAge) {
   return `${cookieName()}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secureCookies ? '; Secure' : ''}`;
 }
@@ -137,7 +144,7 @@ function requireMutationGuards(req, res, session) {
   return true;
 }
 function clientIp(req) {
-  if (process.env.VEXON_TRUST_PROXY === 'true') return String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+  if (process.env.XSAYATRADE_TRUST_PROXY === 'true') return String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
   return req.socket.remoteAddress || 'unknown';
 }
 function rateLimited(key, limit, windowMs) {
@@ -175,7 +182,7 @@ function decryptVault(envelope) {
 }
 async function readVault() {
   try { return decryptVault(JSON.parse(await fs.readFile(path.join(dataDir, 'credentials.vault'), 'utf8'))); }
-  catch (error) { if (error.code === 'ENOENT') return { exchanges: [] }; throw new Error('Credential vault could not be decrypted; check VEXON_MASTER_KEY.'); }
+  catch (error) { if (error.code === 'ENOENT') return { exchanges: [] }; throw new Error('Credential vault could not be decrypted; check XSAYATRADE_MASTER_KEY.'); }
 }
 async function writeVault(vault) {
   await fs.mkdir(dataDir, { recursive: true, mode: 0o700 });
@@ -202,11 +209,11 @@ async function readAccessCodes() {
   try { return JSON.parse(await fs.readFile(path.join(dataDir, 'access-codes.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') return []; throw new Error('Access-code store is unavailable.'); }
 }
-function accessCodeHash(code) { return createHmac('sha256', masterKey).update('vexon-access-code-v1:').update(code).digest('hex'); }
-function featureCookieName() { return secureCookies ? '__Host-vexon_features' : 'vexon_features'; }
+function accessCodeHash(code) { return createHmac('sha256', masterKey).update('xsayatrade-access-code-v1:').update(code).digest('hex'); }
+function featureCookieName() { return secureCookies ? '__Host-xsayatrade_features' : 'xsayatrade_features'; }
 function featureCookieValue(grants, maxAge) {
   const payload = Buffer.from(JSON.stringify({ grants })).toString('base64url');
-  const signature = createHmac('sha256', masterKey).update(`vexon-feature-grant-v1:${payload}`).digest('base64url');
+  const signature = createHmac('sha256', masterKey).update(`xsayatrade-feature-grant-v1:${payload}`).digest('base64url');
   return `${featureCookieName()}=${payload}.${signature}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${Math.max(0, Math.min(maxAge, 365 * 24 * 60 * 60))}${secureCookies ? '; Secure' : ''}`;
 }
 function readFeatureGrant(req) {
@@ -214,7 +221,7 @@ function readFeatureGrant(req) {
   if (!token) return {};
   const [payload, signature] = token.split('.');
   if (!payload || !signature) return {};
-  const expected = createHmac('sha256', masterKey).update(`vexon-feature-grant-v1:${payload}`).digest();
+  const expected = createHmac('sha256', masterKey).update(`xsayatrade-feature-grant-v1:${payload}`).digest();
   let supplied;
   try { supplied = Buffer.from(signature, 'base64url'); } catch { return {}; }
   if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) return {};
@@ -254,7 +261,7 @@ async function initializeAdminAndSettings() {
     adminRecord = record;
   } catch (error) {
     if (error.code !== 'ENOENT') throw new Error('Admin account store is invalid; refusing to start.');
-    if (!/^[a-zA-Z0-9_.-]{3,50}$/.test(bootstrapAdminName) || bootstrapAdminPassword.length < 16 || bootstrapAdminPassword.length > 128) throw new Error('First run: set VEXON_ADMIN_USERNAME (3-50 chars) and VEXON_ADMIN_PASSWORD (16-128 chars).');
+    if (!/^[a-zA-Z0-9_.-]{3,50}$/.test(bootstrapAdminName) || bootstrapAdminPassword.length < 16 || bootstrapAdminPassword.length > 128) throw new Error('First run: set XSAYATRADE_ADMIN_USERNAME (3-50 chars) and XSAYATRADE_ADMIN_PASSWORD (16-128 chars).');
     const salt = randomBytes(16);
     adminRecord = { username: bootstrapAdminName, salt: salt.toString('hex'), passwordHash: scryptSync(bootstrapAdminPassword, salt, 64).toString('hex'), createdAt: new Date().toISOString(), passwordUpdatedAt: new Date().toISOString() };
     await writePrivateJson(adminFile, adminRecord);
@@ -268,7 +275,7 @@ async function initializeAdminAndSettings() {
   } catch (error) { if (error.code !== 'ENOENT') throw new Error('Admin settings store is invalid; refusing to start.'); }
   const initialOrigin = allowedOrigins.values().next().value || manageableOrigins.values().next().value || null;
   const selectedOrigin = savedOrigin || initialOrigin;
-  if (selectedOrigin && manageableOrigins.size && !manageableOrigins.has(selectedOrigin)) throw new Error('Saved server origin is not in VEXON_MANAGEABLE_ORIGINS.');
+  if (selectedOrigin && manageableOrigins.size && !manageableOrigins.has(selectedOrigin)) throw new Error('Saved server origin is not in XSAYATRADE_MANAGEABLE_ORIGINS.');
   if (isProduction && !selectedOrigin) throw new Error('Production requires at least one approved public origin.');
   activeOrigin = selectedOrigin;
   activeHost = activeOrigin ? new URL(activeOrigin).host.toLowerCase() : null;
@@ -653,7 +660,7 @@ const server = http.createServer(async (req, res) => {
     serveStatic(req, res, url);
   } catch (error) {
     const status = error.statusCode || 500;
-    if (status >= 500) console.error('Vexon request failed:', error.message);
+    if (status >= 500) console.error('XsayaTrade request failed:', error.message);
     if (!res.headersSent) json(res, status, { message: status >= 500 ? 'خطای داخلی سرور.' : error.message });
   }
 });
@@ -663,12 +670,12 @@ server.requestTimeout = 30_000;
 server.keepAliveTimeout = 5_000;
 initializeAdminAndSettings().then(() => {
   server.listen(port, host, () => {
-    console.log(`Vexon secure backend listening on ${host}:${port}`);
+    console.log(`XsayaTrade secure backend listening on ${host}:${port}`);
     console.log(`Admin account: ${adminRecord.username} (password stored as scrypt hash)`);
     console.log(`Exchange connection: ${connectionsEnabled ? 'enabled (CCXT verification required)' : 'disabled'}`);
     console.log(`Live orders: ${liveTradingEnabled ? 'enabled with strict spot/limit controls' : 'disabled (default)'}`);
   });
 }).catch(error => {
-  console.error('Vexon startup configuration error:', error.message);
+  console.error('XsayaTrade startup configuration error:', error.message);
   process.exit(1);
 });

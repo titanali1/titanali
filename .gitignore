@@ -1,7 +1,7 @@
 .env
 .env.*
 !.env.example
-.vexon-data/
+.xsayatrade-data/
 node_modules/
 android/.gradle/
 android/local.properties
@@ -11,3 +11,4 @@ android/app/release/
 *.keystore
 *.apk
 *.aab
+.vexon-data/

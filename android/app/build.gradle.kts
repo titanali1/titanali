@@ -3,14 +3,14 @@ plugins {
 }
 
 android {
-    namespace = "ai.vexon.app"
+    namespace = "ai.xsayatrade.app"
     compileSdk = 35
 
     defaultConfig {
-        val backendUrl = providers.gradleProperty("xsayatradeBackendUrl").orElse(providers.gradleProperty("vexonBackendUrl")).orElse("").get()
+        val backendUrl = providers.gradleProperty("xsayatradeBackendUrl").orElse("").get()
         val escapedBackendUrl = backendUrl.replace("\\", "\\\\").replace("\"", "\\\"")
-        buildConfigField("String", "VEXON_BACKEND_URL", "\"$escapedBackendUrl\"")
-        applicationId = "ai.vexon.app"
+        buildConfigField("String", "XSAYATRADE_BACKEND_URL", "\"$escapedBackendUrl\"")
+        applicationId = "ai.xsayatrade.app"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

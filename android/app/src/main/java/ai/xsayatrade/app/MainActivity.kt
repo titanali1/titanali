@@ -1,4 +1,4 @@
-package ai.vexon.app
+package ai.xsayatrade.app
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
@@ -65,7 +65,7 @@ class MainActivity : Activity() {
         Thread.setDefaultUncaughtExceptionHandler { thread, failure ->
             try {
                 val report = buildCrashReport(thread, failure)
-                openFileOutput("vexon-last-crash.txt", MODE_PRIVATE).use { it.write(report.toByteArray(Charsets.UTF_8)) }
+                openFileOutput("xsayatrade-last-crash.txt", MODE_PRIVATE).use { it.write(report.toByteArray(Charsets.UTF_8)) }
             } catch (_: Throwable) {
                 // Preserve the platform's crash handling if local diagnostics cannot be written.
             }
@@ -89,13 +89,13 @@ class MainActivity : Activity() {
     }
 
     private fun readPreviousCrash(): String? = try {
-        openFileInput("vexon-last-crash.txt").bufferedReader(Charsets.UTF_8).use { it.readText().take(12000) }
+        openFileInput("xsayatrade-last-crash.txt").bufferedReader(Charsets.UTF_8).use { it.readText().take(12000) }
     } catch (_: Exception) {
         null
     }
 
     private fun clearPreviousCrash() {
-        try { deleteFile("vexon-last-crash.txt") } catch (_: Exception) { }
+        try { deleteFile("xsayatrade-last-crash.txt") } catch (_: Exception) { }
     }
 
     private fun webViewProviderVersion(): String = try {
@@ -212,7 +212,7 @@ class MainActivity : Activity() {
 
     private fun loadAppUrl() {
         val currentWebView = webView ?: return
-        val configuredBackend = BuildConfig.VEXON_BACKEND_URL.trim().trimEnd('/')
+        val configuredBackend = BuildConfig.XSAYATRADE_BACKEND_URL.trim().trimEnd('/')
         if (configuredBackend.isNotEmpty()) {
             val uri = try { Uri.parse(configuredBackend) } catch (_: Exception) { null }
             if (uri == null || uri.scheme != "https" || uri.host.isNullOrBlank()) {
