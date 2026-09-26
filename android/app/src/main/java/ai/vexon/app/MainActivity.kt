@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
@@ -41,7 +42,9 @@ class MainActivity : Activity() {
             settings.allowContentAccess = false
             settings.javaScriptCanOpenWindowsAutomatically = false
             settings.setSupportMultipleWindows(false)
-            settings.safeBrowsingEnabled = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                settings.safeBrowsingEnabled = true
+            }
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
                 override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
