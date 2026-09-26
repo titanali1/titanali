@@ -64,23 +64,34 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
           script: |
+            set +e
             LOG="$GITHUB_WORKSPACE/android-startup-logcat.txt"
             LAUNCH="$GITHUB_WORKSPACE/android-launch.txt"
-            adb logcat -c
-            if ! adb install -r "$GITHUB_WORKSPACE/apk/app-debug.apk"; then
-              adb logcat -d -v threadtime -t 3000 > "$LOG" || true
-              cat "$LOG" || true
-              exit 1
-            fi
-            adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity > "$LAUNCH" 2>&1 || true
-            cat "$LAUNCH" || true
-            sleep 8
-            APP_PID="$(adb shell pidof ai.vexon.app.debug 2>/dev/null | tr -d '\r' || true)"
-            adb logcat -d -v threadtime -t 3000 > "$LOG" || true
+            {
+              echo "workspace=$GITHUB_WORKSPACE"
+              echo "api=${{ matrix.api-level }}"
+              pwd
+              ls -l "$GITHUB_WORKSPACE/apk/app-debug.apk"
+              adb devices -l
+              adb logcat -c
+              adb install -r "$GITHUB_WORKSPACE/apk/app-debug.apk"
+              INSTALL_STATUS=$?
+              echo "install_status=$INSTALL_STATUS"
+              adb shell am start -W -n ai.vexon.app.debug/ai.vexon.app.MainActivity > "$LAUNCH" 2>&1
+              START_STATUS=$?
+              echo "start_status=$START_STATUS"
+              cat "$LAUNCH"
+              sleep 8
+              APP_PID="$(adb shell pidof ai.vexon.app.debug 2>/dev/null | tr -d '\r')"
+              echo "app_pid=$APP_PID"
+              adb logcat -d -v threadtime -t 3000
+            } > "$LOG" 2>&1
+            cat "$LOG"
+            APP_PID="$(grep '^app_pid=' "$LOG" | tail -1 | cut -d= -f2-)"
             if [ -z "$APP_PID" ]; then
-              cat "$LOG" || true
-              FAILURE="$(grep -E -m1 'FATAL EXCEPTION|Caused by:|Fatal signal' "$LOG" | tr -d '\r' || true)"
-              echo "::error title=Android app exited::${FAILURE:-The app process exited shortly after launch.}"
+              FAILURE="$(grep -E -m1 'FATAL EXCEPTION|Caused by:|Fatal signal|INSTALL_FAILED|Error:' "$LOG" | tr -d '\r' || true)"
+              echo "::error title=Android startup diagnostic::${FAILURE:-Check the uploaded Android startup log for the failure details.}"
+              { echo '### Android startup log'; echo '```text'; tail -n 150 "$LOG"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
             echo "Vexon stayed alive after launch (PID $APP_PID) on API ${{ matrix.api-level }}."
