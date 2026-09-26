@@ -1,0 +1,9 @@
+.git
+node_modules
+android
+.vexon-data
+.env
+.env.*
+!.env.example
+*.apk
+*.aab

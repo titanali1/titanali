@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1018" />
+  <meta name="description" content="Vexon؛ داشبورد آزمایشی معامله‌گری هوشمند برای طلا و رمزارزها." />
+  <meta name="author" content="dmj74" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <title>Vexon | معامله‌گری هوشمند</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./exchange.css" />
+  <link rel="stylesheet" href="./extra.css" />
+  <link rel="stylesheet" href="./backend-ui.css" />
+  <link rel="stylesheet" href="./i18n.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="#" class="brand"><span class="brand-mark"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M4 7h7.5L18 23 24.5 7H32L21 30h-6L4 7Z" fill="currentColor"/><path d="M24 23h8l-4 7h-8l4-7Z" fill="#d0fff0"/></svg></span><span>vexon<span class="brand-dot">.</span></span></a>
+      <div class="side-label">فضای کار</div>
+      <nav class="side-nav" aria-label="ناوبری اصلی">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span>داشبورد</a>
+        <a class="nav-item" href="#markets"><span class="nav-icon">⌁</span>بازارها</a>
+        <a class="nav-item" href="#portfolio"><span class="nav-icon">◫</span>دارایی‌های من</a>
+        <a class="nav-item" href="#activity"><span class="nav-icon">◷</span>تاریخچه معاملات</a>
+      </nav>
+      <div class="side-label tools-label">ابزارها</div>
+      <nav class="side-nav">
+        <button class="nav-item" id="openAi"><span class="nav-icon">✳</span>دستیار هوشمند<span class="new-tag">AI</span></button>
+        <button class="nav-item" id="openExchange"><span class="nav-icon">⌘</span>مدیریت صرافی‌ها</button>
+        <button class="nav-item" id="openManagement"><span class="nav-icon">⚙</span>مدیریت سرور</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><span class="help-orb">✦</span><div><b>شروع امن با Vexon</b><p>اولین قدم را با حساب آزمایشی بردار.</p><button id="learnMore">بیشتر بدانید <span>←</span></button></div></div>
+        <div class="user-card"><div class="avatar">آ</div><div class="user-copy"><b>آرمان نادری</b><small>حساب آزمایشی</small></div><button class="more-btn" aria-label="منو">•••</button></div>
+      </div>
+    </aside>
+
+    <main class="main" id="overview">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark"><svg viewBox="0 0 36 36"><path d="M4 7h7.5L18 23 24.5 7H32L21 30h-6L4 7Z" fill="currentColor"/><path d="M24 23h8l-4 7h-8l4-7Z" fill="#d0fff0"/></svg></span> vexon<span class="brand-dot">.</span></div>
+        <div class="breadcrumb"><span>فضای کار</span><i>/</i><b>داشبورد</b></div>
+        <div class="top-actions"><span class="market-status"><i></i> بازار آزمایشی</span><button class="lang-switch" id="languageToggle" aria-label="تغییر زبان">EN</button><button class="icon-button notification" aria-label="اعلان‌ها">♧<i></i></button><button class="top-avatar">آ</button></div>
+      </header>
+      <div class="content">
+        <section class="welcome-row">
+          <div><div class="eyebrow"><span class="sparkle">✳</span> شنبه، ۴ مهر ۱۴۰۵</div><h1>سلام آرمان، <span>وقتشه هوشمندانه معامله کنی.</span></h1><p class="subheading">بازارها را بررسی کن و کنترل سرمایه‌ات را در دست بگیر.</p></div>
+          <button class="outline-button" id="openExchangeTop"><span>＋</span> مدیریت صرافی‌ها</button>
+        </section>
+
+        <section class="stats-grid" id="portfolio">
+          <article class="stat-card balance-card"><div class="stat-head"><span>ارزش کل دارایی‌ها</span><button class="dots">•••</button></div><div class="balance-line"><strong id="totalBalance">۲۴,۸۵۰,۰۰۰</strong><span class="currency">تومان</span><button class="eye" id="hideBalance" aria-label="مخفی کردن موجودی">◉</button></div><div class="stat-foot"><span class="change positive">↗ ۸.۲٪</span><span>در ۳۰ روز گذشته</span><div class="balance-spark"><svg viewBox="0 0 110 34" preserveAspectRatio="none"><path d="M0 29 C12 26 15 19 24 22 S38 28 47 16 62 20 70 11 83 16 90 8 101 12 110 2" fill="none" stroke="#68e2b8" stroke-width="2.4"/></svg></div></div></article>
+          <article class="stat-card"><div class="stat-head"><span>سود و زیان امروز</span><span class="stat-icon mint">↗</span></div><div class="stat-number positive-text">+۱۸۴,۵۰۰ <small>تومان</small></div><div class="stat-foot"><span class="change positive">+۲.۴٪</span><span>نسبت به دیروز</span><div class="mini-bars"><i style="height:38%"></i><i style="height:56%"></i><i style="height:44%"></i><i style="height:72%"></i><i style="height:57%"></i><i style="height:84%"></i><i style="height:68%"></i><i style="height:100%"></i></div></div></article>
+          <article class="stat-card"><div class="stat-head"><span>معاملات این ماه</span><span class="stat-icon purple">⌁</span></div><div class="stat-number">۲۸ <small>معامله</small></div><div class="stat-foot"><span class="muted">نرخ معاملات موفق</span><span class="win-rate">۷۸٪</span><div class="progress"><i></i></div></div></article>
+        </section>
+
+        <section class="trade-layout">
+          <article class="panel chart-panel">
+            <div class="panel-heading chart-heading"><div><div class="panel-title">تحلیل بازار</div><div class="asset-select"><span class="coin-icon btc">₿</span><div><b id="chartAsset">بیت‌کوین</b><small id="chartTicker">BTC / USDT</small></div><button id="assetPicker" class="chevron">⌄</button></div></div><div class="chart-tools"><div class="range-tabs"><button data-range="۱س">۱س</button><button data-range="۲۴س" class="selected">۲۴س</button><button data-range="۱هف">۱هف</button><button data-range="۱ماه">۱ماه</button></div><button class="expand-btn" aria-label="بزرگنمایی">⛶</button></div></div>
+            <div class="chart-price"><strong id="chartPrice">۶۷,۴۲۸٫۵۰</strong><span class="currency">USDT</span><span class="change positive">+۲.۸۴٪</span><small>در ۲۴ ساعت گذشته</small></div>
+            <div class="chart-wrap"><div class="chart-y-labels"><span>۶۸,۰۰۰</span><span>۶۷,۵۰۰</span><span>۶۷,۰۰۰</span><span>۶۶,۵۰۰</span></div><svg class="price-chart" viewBox="0 0 760 220" preserveAspectRatio="none" role="img" aria-label="نمودار تغییرات قیمت بیت‌کوین"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#5de0b4" stop-opacity=".21"/><stop offset="100%" stop-color="#5de0b4" stop-opacity="0"/></linearGradient></defs><g class="grid-lines"><path d="M0 25H760M0 75H760M0 125H760M0 175H760"/></g><path class="area-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22 L760 220H0Z" fill="url(#area)"/><path class="line-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22" fill="none" stroke="#66e5ba" stroke-width="2.6" vector-effect="non-scaling-stroke"/><circle cx="744" cy="14" r="4" fill="#09131b" stroke="#6ce9be" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="chart-x-labels"><span>۰۰:۰۰</span><span>۰۴:۰۰</span><span>۰۸:۰۰</span><span>۱۲:۰۰</span><span>۱۶:۰۰</span><span>۲۰:۰۰</span><span>اکنون</span></div></div>
+            <div class="chart-footer"><span><i class="legend-dot"></i> قیمت بیت‌کوین</span><span>داده‌ها نمایشی هستند <b>ⓘ</b></span></div>
+          </article>
+
+          <article class="panel ai-panel"><div class="ai-top"><div class="ai-heading"><span class="ai-icon">✳</span><div><b>بینش Vexon AI</b><small>تحلیل هوشمند بازار</small></div></div><span class="live-pill"><i></i> نمونه</span></div><div class="signal-label">سیگنال فعلی <span>BTC / USDT</span></div><div class="signal-main"><div><strong>تمایل به خرید</strong><p>مومنتوم صعودی در حال تقویت است</p></div><div class="signal-gauge"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="25"/><circle class="gauge-progress" cx="32" cy="32" r="25"/></svg><b>۷۸<small>٪</small></b></div></div><div class="signal-divider"></div><div class="insight"><span class="insight-icon">↗</span><p>حجم معاملات در ۴ ساعت گذشته <b>۱۲٪ افزایش</b> داشته است. حمایت بعدی در <b>۶۶,۸۰۰ USDT</b> قرار دارد.</p></div><button class="ai-button" id="openAiAnalysis">مشاهده تحلیل کامل <span>←</span></button><div class="ai-disclaimer">این تحلیل توصیه مالی نیست.</div></article>
+        </section>
+
+        <section class="bottom-layout">
+          <article class="panel markets-panel" id="markets"><div class="section-head"><div><div class="panel-title">بازارهای محبوب</div><small>قیمت‌ها بر اساس حساب آزمایشی</small></div><button class="text-link" id="allMarkets">مشاهده همه <span>←</span></button></div><div class="market-table"><div class="table-head"><span>دارایی</span><span>قیمت</span><span>تغییر ۲۴س</span><span>عملیات</span></div>
+            <div class="market-row" data-asset="btc"><div class="asset-name"><span class="coin-icon btc">₿</span><span><b>بیت‌کوین</b><small>BTC / USDT</small></span></div><b>۶۷,۴۲۸٫۵۰</b><span class="change positive">+۲.۸۴٪</span><button class="trade-link" data-trade="buy" data-name="بیت‌کوین">خرید</button></div>
+            <div class="market-row" data-asset="eth"><div class="asset-name"><span class="coin-icon eth">◆</span><span><b>اتریوم</b><small>ETH / USDT</small></span></div><b>۳,۵۲۱٫۱۸</b><span class="change negative">−۰.۶۲٪</span><button class="trade-link" data-trade="buy" data-name="اتریوم">خرید</button></div>
+            <div class="market-row" data-asset="gold"><div class="asset-name"><span class="coin-icon gold">Au</span><span><b>طلای ۱۸ عیار</b><small>GOLD / IRR</small></span></div><b>۳,۴۸۲,۰۰۰</b><span class="change positive">+۱.۱۲٪</span><button class="trade-link" data-trade="buy" data-name="طلای ۱۸ عیار">خرید</button></div>
+            <div class="market-row" data-asset="sol"><div class="asset-name"><span class="coin-icon sol">◎</span><span><b>سولانا</b><small>SOL / USDT</small></span></div><b>۱۸۲٫۴۰</b><span class="change positive">+۵.۲۱٪</span><button class="trade-link" data-trade="buy" data-name="سولانا">خرید</button></div>
+          </div></article>
+
+          <article class="panel bot-panel"><div class="section-head bot-heading"><div><div class="panel-title">معامله‌گر خودکار</div><small>مدیریت هوشمند معاملات</small></div><button class="settings-mini" id="botSettings" aria-label="تنظیمات معامله‌گر">⚙</button></div><div class="bot-status"><span class="bot-orb"><span>✳</span></span><div><b id="botStatusTitle">ربات غیرفعال است</b><small id="botStatusDetail">کنترل معامله در دست شماست</small></div><button class="switch" id="botToggle" role="switch" aria-checked="false" aria-label="فعال‌سازی معامله‌گر خودکار"><i></i></button></div><div class="bot-mode"><span>حالت معامله</span><div class="segmented"><button id="manualMode" class="selected">دستی</button><button id="autoMode">خودکار</button></div></div><div class="risk-row"><span>سطح ریسک</span><div class="risk-options"><button data-risk="کم" class="selected">کم</button><button data-risk="متوسط">متوسط</button><button data-risk="زیاد">زیاد</button></div></div><div class="bot-foot"><span class="lock-icon">▣</span> فعال‌سازی ربات نیازمند بک‌اند امن است <button id="botInfo">ⓘ</button></div></article>
+        </section>
+
+        <section class="panel activity-panel" id="activity"><div class="section-head"><div><div class="panel-title">آخرین فعالیت‌ها</div><small>معاملات اخیر حساب آزمایشی</small></div><button class="text-link" id="activityFilter">خروجی CSV <span>↓</span></button></div><div class="activity-list" id="activityList"><div class="activity-row"><span class="activity-symbol btc">₿</span><div class="activity-title"><b>خرید بیت‌کوین</b><small>امروز، ۱۲:۴۲</small></div><span class="activity-amount">− ۱,۲۰۰,۰۰۰ <small>تومان</small></span><span class="activity-badge buy-badge">خرید</span></div><div class="activity-row"><span class="activity-symbol gold">Au</span><div class="activity-title"><b>خرید طلای ۱۸ عیار</b><small>دیروز، ۱۸:۱۵</small></div><span class="activity-amount">− ۸۵۰,۰۰۰ <small>تومان</small></span><span class="activity-badge buy-badge">خرید</span></div><div class="activity-row"><span class="activity-symbol eth">◆</span><div class="activity-title"><b>فروش اتریوم</b><small>۲۸ شهریور، ۱۰:۰۸</small></div><span class="activity-amount positive-text">+ ۲,۴۱۰,۰۰۰ <small>تومان</small></span><span class="activity-badge sell-badge">فروش</span></div></div></section>
+        <footer class="footer"><span>© ۱۴۰۵ Vexon</span><span><i></i> نسخه آزمایشی · معاملات واقعی غیرفعال</span><a href="#" id="securityLink">امنیت و حریم خصوصی</a><span class="signature">طراحی و توسعه: <b>dmj74</b></span></footer>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav"><a class="active" href="#overview"><span>▦</span>خانه</a><a href="#markets"><span>⌁</span>بازار</a><a href="#portfolio"><span>◫</span>دارایی</a><button id="mobileTrade"><span>＋</span>معامله</button><a href="#activity"><span>◷</span>فعالیت</a></nav>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop" id="modalBackdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="بستن">×</button><div id="modalContent"></div></section></div>
+  <script src="./i18n.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

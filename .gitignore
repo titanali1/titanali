@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.vexon-data/
+node_modules/
+android/.gradle/
+android/local.properties
+android/app/build/
+android/app/release/
+*.jks
+*.keystore
+*.apk
+*.aab
