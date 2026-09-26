@@ -44,7 +44,7 @@ jobs:
       - name: Report Gradle failure details
         if: failure() && steps.build-apk.outcome == 'failure'
         run: |
-          details="$(grep -Ei -A2 -B2 '(^e:|\.kt:[0-9]+|error:|unresolved reference|type mismatch|overload resolution ambiguity|cannot infer|not enough information|What went wrong:|Could not resolve|Could not find)' "$RUNNER_TEMP/android-build.log" | head -n 32)"
+          details="$(grep -Ei -A2 -B2 'MainActivity\.kt:|^e: |error:|unresolved reference|type mismatch|overload resolution ambiguity|cannot infer|not enough information|Compilation error|What went wrong:' "$RUNNER_TEMP/android-build.log" | head -n 40)"
           if [ -z "$details" ]; then details="$(tail -n 24 "$RUNNER_TEMP/android-build.log")"; fi
           details=${details//'%'/'%25'}
           details=${details//$'\r'/'%0D'}
