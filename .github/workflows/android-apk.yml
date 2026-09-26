@@ -26,30 +26,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android SDK
-        shell: bash
-        run: |
-          SDKMANAGER="$(command -v sdkmanager || true)"
-          if [[ -z "$SDKMANAGER" ]]; then
-            SDKMANAGER="$(find /usr/local/lib/android/sdk /opt/android-sdk "$HOME/Android/Sdk" -type f -path '*/bin/sdkmanager' -print -quit 2>/dev/null || true)"
-          fi
-          if [[ -z "$SDKMANAGER" ]]; then
-            echo 'Android SDK command-line tools (sdkmanager) were not found on the runner.' >&2
-            exit 1
-          fi
-          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
-          if [[ -z "$SDK_ROOT" && "$SDKMANAGER" =~ ^(.+)/cmdline-tools/[^/]+/bin/sdkmanager$ ]]; then
-            SDK_ROOT="${BASH_REMATCH[1]}"
-          fi
-          if [[ -z "$SDK_ROOT" ]]; then
-            echo 'Could not determine Android SDK root.' >&2
-            exit 1
-          fi
-          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
-          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: android-actions/setup-android@v4
+      - name: Install Android SDK platform
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
