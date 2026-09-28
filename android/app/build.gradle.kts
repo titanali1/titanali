@@ -16,8 +16,8 @@ android {
         applicationId = "ai.xsayatrade.app"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "2.0.0"
     }
 
     buildTypes {
@@ -49,7 +49,7 @@ kotlin {
 
 val syncXsayaTradeWebAssets by tasks.registering(Copy::class) {
     from(rootProject.projectDir.parentFile) {
-        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "xsayatrade-logo-192.png", "xsayatrade-logo-512.png", "sw.js")
+        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "xsayatrade-logo-192.png", "xsayatrade-logo-512.png", "sw.js", "ai-studio.html", "ai-studio.css", "ai-studio.js", "ai-studio-hero.png")
     }
     into(layout.projectDirectory.dir("src/main/assets"))
 }
