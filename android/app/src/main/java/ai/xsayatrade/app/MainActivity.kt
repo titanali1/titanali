@@ -3,7 +3,6 @@ package ai.xsayatrade.app
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -20,7 +19,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.webkit.ValueCallback
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -40,15 +38,14 @@ class MainActivity : Activity() {
     private lateinit var assetLoader: WebViewAssetLoader
     private var backendHost: String? = null
     private var rendererRestartAttempted = false
-    private var imageFileCallback: ValueCallback<Array<Uri>>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installCrashReporter()
         super.onCreate(savedInstanceState)
         try {
             WindowCompat.setDecorFitsSystemWindows(window, true)
-            window.statusBarColor = Color.rgb(12, 13, 19)
-            window.navigationBarColor = Color.rgb(12, 13, 19)
+            window.statusBarColor = Color.rgb(11, 16, 24)
+            window.navigationBarColor = Color.rgb(11, 16, 24)
             window.decorView.systemUiVisibility = 0
             val previousCrash = readPreviousCrash()
             if (previousCrash != null) {
@@ -61,16 +58,6 @@ class MainActivity : Activity() {
         } catch (failure: LinkageError) {
             showStartupError(failure)
         }
-    }
-
-    @Deprecated("Deprecated in Android, retained for the WebView file picker compatibility callback")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == IMAGE_PICKER_REQUEST) {
-            imageFileCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
-            imageFileCallback = null
-            return
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun installCrashReporter() {
@@ -92,7 +79,7 @@ class MainActivity : Activity() {
     }
 
     private fun buildCrashReport(thread: Thread, failure: Throwable): String = buildString {
-        appendLine("NOVA AI Studio startup/runtime crash report")
+        appendLine("XsayaTrade startup/runtime crash report")
         appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
         appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
         appendLine("Thread: ${thread.name}")
@@ -137,7 +124,7 @@ class MainActivity : Activity() {
                 .build()
         }
         val view = WebView(this).apply {
-            setBackgroundColor(Color.rgb(12, 13, 19))
+            setBackgroundColor(Color.rgb(11, 16, 24))
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = false
@@ -148,24 +135,7 @@ class MainActivity : Activity() {
             if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ENABLE)) {
                 WebSettingsCompat.setSafeBrowsingEnabled(settings, true)
             }
-            webChromeClient = object : WebChromeClient() {
-                override fun onShowFileChooser(
-                    view: WebView,
-                    filePathCallback: ValueCallback<Array<Uri>>,
-                    fileChooserParams: FileChooserParams
-                ): Boolean {
-                    imageFileCallback?.onReceiveValue(null)
-                    imageFileCallback = filePathCallback
-                    return try {
-                        startActivityForResult(fileChooserParams.createIntent(), IMAGE_PICKER_REQUEST)
-                        true
-                    } catch (_: ActivityNotFoundException) {
-                        imageFileCallback = null
-                        filePathCallback.onReceiveValue(null)
-                        false
-                    }
-                }
-            }
+            webChromeClient = WebChromeClient()
             webViewClient = createWebViewClient()
         }
         webView?.let { previous ->
@@ -186,7 +156,7 @@ class MainActivity : Activity() {
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
             val uri = request.url
             if (uri.host == "appassets.androidplatform.net" && uri.path?.startsWith("/api/") == true) {
-                val body = "{\"message\":\"AI generation backend is not configured\"}".toByteArray()
+                val body = "{\"message\":\"Secure trading backend is not configured\"}".toByteArray()
                 return WebResourceResponse(
                     "application/json", "UTF-8", 503, "Service Unavailable",
                     mapOf("Cache-Control" to "no-store"), ByteArrayInputStream(body)
@@ -250,14 +220,14 @@ class MainActivity : Activity() {
                 return
             }
             backendHost = uri.host
-            currentWebView.loadUrl("$configuredBackend/ai-studio.html?native=1")
+            currentWebView.loadUrl("$configuredBackend/?native=1")
         } else {
-            currentWebView.loadUrl("https://appassets.androidplatform.net/assets/ai-studio.html?native=1")
+            currentWebView.loadUrl("https://appassets.androidplatform.net/assets/index.html?native=1")
         }
     }
 
     private fun showStartupError(error: Throwable) {
-        android.util.Log.e("NovaStudio", "App startup failed", error)
+        android.util.Log.e("XsayaTrade", "App startup failed", error)
         showFallback(
             "برنامه نتوانست شروع شود",
             "خطای سازگاری: ${error.javaClass.name}: ${error.message ?: "بدون توضیح"}\n\nAndroid System WebView یا Chrome را به‌روز کنید و دوباره تلاش کنید."
@@ -277,7 +247,7 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER
             layoutDirection = View.LAYOUT_DIRECTION_RTL
             setPadding(24, 24, 24, 24)
-            setBackgroundColor(Color.rgb(12, 13, 19))
+            setBackgroundColor(Color.rgb(11, 16, 24))
         }
         val heading = TextView(this).apply {
             text = title
@@ -300,7 +270,7 @@ class MainActivity : Activity() {
             text = "کپی گزارش فنی"
             setOnClickListener {
                 val report = buildString {
-                    appendLine("NOVA AI Studio diagnostic report")
+                    appendLine("XsayaTrade diagnostic report")
                     appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
                     appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
                     appendLine("WebView: ${webViewProviderVersion()}")
@@ -308,7 +278,7 @@ class MainActivity : Activity() {
                     appendLine(detail)
                 }
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText("NOVA AI Studio diagnostics", report))
+                clipboard.setPrimaryClip(ClipData.newPlainText("XsayaTrade diagnostics", report))
                 Toast.makeText(this@MainActivity, "گزارش فنی کپی شد؛ آن را برای پشتیبانی بفرستید.", Toast.LENGTH_LONG).show()
             }
         }
@@ -348,9 +318,5 @@ class MainActivity : Activity() {
     override fun onBackPressed() {
         val current = webView
         if (current != null && current.canGoBack()) current.goBack() else super.onBackPressed()
-    }
-
-    private companion object {
-        const val IMAGE_PICKER_REQUEST = 7401
     }
 }

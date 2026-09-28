@@ -1,11 +1,11 @@
 <resources>
     <style name="Theme.XsayaTrade" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:colorAccent">#E986C6</item>
-        <item name="android:navigationBarColor">#0C0D13</item>
-        <item name="android:statusBarColor">#0C0D13</item>
+        <item name="android:colorAccent">#69E2BA</item>
+        <item name="android:navigationBarColor">#0B1018</item>
+        <item name="android:statusBarColor">#0B1018</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowBackground">#0C0D13</item>
+        <item name="android:windowBackground">#0B1018</item>
     </style>
 </resources>
