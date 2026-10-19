@@ -11,4 +11,5 @@ android/app/release/
 *.keystore
 *.apk
 *.aab
+xsayatrade-cpanel.zip
 .vexon-data/

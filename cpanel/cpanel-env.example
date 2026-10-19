@@ -1,0 +1,17 @@
+# Copy values into cPanel > Setup Node.js App > Environment variables.
+# Do NOT upload this file as .env. Replace every placeholder before starting.
+NODE_ENV=production
+HOST=0.0.0.0
+XSAYATRADE_ADMIN_USERNAME=replace-with-your-admin-username
+XSAYATRADE_ADMIN_PASSWORD=replace-with-a-unique-random-password
+XSAYATRADE_MASTER_KEY=replace-with-output-of-openssl-rand-hex-32
+XSAYATRADE_DATA_DIR=/home/CPANEL_USER/xsayatrade-private-data
+XSAYATRADE_ALLOWED_HOSTS=xsayatrade.ir,www.xsayatrade.ir
+XSAYATRADE_ALLOWED_ORIGINS=https://xsayatrade.ir,https://www.xsayatrade.ir
+XSAYATRADE_MANAGEABLE_ORIGINS=https://xsayatrade.ir,https://www.xsayatrade.ir
+XSAYATRADE_TRUST_PROXY=true
+XSAYATRADE_ENABLE_EXCHANGE_CONNECTIONS=false
+XSAYATRADE_LIVE_TRADING=false
+XSAYATRADE_ALLOWED_EXCHANGES=binance,okx,kucoin,nobitex,wallex,bitpin
+XSAYATRADE_ORDER_QUOTE_LIMITS={"USDT":100}
+XSAYATRADE_MAX_LIMIT_DEVIATION_PERCENT=2
