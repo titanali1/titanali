@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --env-file=.env server.js",
     "test": "node --test"
   },
   "dependencies": {
-    "ccxt": "4.5.78"
+    "ccxt": "4.5.91",
+    "ws": "8.21.0"
+  },
+  "overrides": {
+    "undici": "7.30.1"
   }
 }

@@ -13,6 +13,8 @@ on:
       - 'i18n.css'
       - 'i18n.js'
       - 'app.js'
+      - 'market-scanner.js'
+      - 'market-scanner.css'
       - 'sw.js'
       - 'icon.svg'
       - 'manifest.webmanifest'

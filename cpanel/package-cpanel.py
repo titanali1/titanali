@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parent.parent
 FILES = [
     "package.json", "package-lock.json", "server.js", "index.html",
     "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css",
-    "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "sw.js",
+    "market-scanner.css", "i18n.js", "app.js", "market-scanner.js",
+    "market-data.js", "market-analysis.js", "manifest.webmanifest", "icon.svg", "sw.js",
     "xsayatrade-logo.png", "xsayatrade-logo.svg", "xsayatrade-logo-192.png",
     "xsayatrade-logo-512.png", ".env.example",
 ]

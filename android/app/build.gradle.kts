@@ -49,7 +49,7 @@ kotlin {
 
 val syncXsayaTradeWebAssets by tasks.registering(Copy::class) {
     from(rootProject.projectDir.parentFile) {
-        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "i18n.js", "app.js", "manifest.webmanifest", "icon.svg", "xsayatrade-logo-192.png", "xsayatrade-logo-512.png", "sw.js")
+        include("index.html", "styles.css", "exchange.css", "extra.css", "backend-ui.css", "i18n.css", "market-scanner.css", "i18n.js", "app.js", "market-scanner.js", "manifest.webmanifest", "icon.svg", "xsayatrade-logo-192.png", "xsayatrade-logo-512.png", "sw.js")
     }
     into(layout.projectDirectory.dir("src/main/assets"))
 }

@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./extra.css" />
   <link rel="stylesheet" href="./backend-ui.css" />
   <link rel="stylesheet" href="./i18n.css" />
+  <link rel="stylesheet" href="./market-scanner.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -27,7 +28,7 @@
       <div class="side-label">فضای کار</div>
       <nav class="side-nav" aria-label="ناوبری اصلی">
         <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span>داشبورد</a>
-        <a class="nav-item" href="#markets"><span class="nav-icon">⌁</span>بازارها</a>
+        <a class="nav-item" href="#marketScanner"><span class="nav-icon">⌁</span>اسکن زندهٔ بازار</a>
         <a class="nav-item" href="#portfolio"><span class="nav-icon">◫</span>دارایی‌های من</a>
         <a class="nav-item" href="#activity"><span class="nav-icon">◷</span>تاریخچه معاملات</a>
       </nav>
@@ -47,7 +48,7 @@
       <header class="topbar">
         <div class="mobile-brand"><span class="brand-mark"><img src="./icon.svg" alt="" /></span> XsayaTrade</div>
         <div class="breadcrumb"><span>فضای کار</span><i>/</i><b>داشبورد</b></div>
-        <div class="top-actions"><span class="market-status"><i></i> بازار آزمایشی</span><button class="lang-switch" id="languageToggle" aria-label="تغییر زبان">EN</button><button class="icon-button notification" aria-label="اعلان‌ها">♧<i></i></button><button class="top-avatar">آ</button></div>
+        <div class="top-actions"><span class="market-status feed-status is-connecting" id="marketFeedStatus"><i></i> در حال اتصال به Binance…</span><button class="lang-switch" id="languageToggle" aria-label="تغییر زبان">EN</button><button class="icon-button notification" aria-label="اعلان‌ها">♧<i></i></button><button class="top-avatar">آ</button></div>
       </header>
       <div class="content">
         <section class="welcome-row">
@@ -64,20 +65,35 @@
         <section class="trade-layout">
           <article class="panel chart-panel">
             <div class="panel-heading chart-heading"><div><div class="panel-title">تحلیل بازار</div><div class="asset-select"><span class="coin-icon btc">₿</span><div><b id="chartAsset">بیت‌کوین</b><small id="chartTicker">BTC / USDT</small></div><button id="assetPicker" class="chevron">⌄</button></div></div><div class="chart-tools"><div class="range-tabs"><button data-range="۱س">۱س</button><button data-range="۲۴س" class="selected">۲۴س</button><button data-range="۱هف">۱هف</button><button data-range="۱ماه">۱ماه</button></div><button class="expand-btn" aria-label="بزرگنمایی">⛶</button></div></div>
-            <div class="chart-price"><strong id="chartPrice">۶۷,۴۲۸٫۵۰</strong><span class="currency">USDT</span><span class="change positive">+۲.۸۴٪</span><small>در ۲۴ ساعت گذشته</small></div>
-            <div class="chart-wrap"><div class="chart-y-labels"><span>۶۸,۰۰۰</span><span>۶۷,۵۰۰</span><span>۶۷,۰۰۰</span><span>۶۶,۵۰۰</span></div><svg class="price-chart" viewBox="0 0 760 220" preserveAspectRatio="none" role="img" aria-label="نمودار تغییرات قیمت بیت‌کوین"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#5de0b4" stop-opacity=".21"/><stop offset="100%" stop-color="#5de0b4" stop-opacity="0"/></linearGradient></defs><g class="grid-lines"><path d="M0 25H760M0 75H760M0 125H760M0 175H760"/></g><path class="area-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22 L760 220H0Z" fill="url(#area)"/><path class="line-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22" fill="none" stroke="#66e5ba" stroke-width="2.6" vector-effect="non-scaling-stroke"/><circle cx="744" cy="14" r="4" fill="#09131b" stroke="#6ce9be" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="chart-x-labels"><span>۰۰:۰۰</span><span>۰۴:۰۰</span><span>۰۸:۰۰</span><span>۱۲:۰۰</span><span>۱۶:۰۰</span><span>۲۰:۰۰</span><span>اکنون</span></div></div>
+            <div class="chart-price"><strong id="chartPrice">—</strong><span class="currency">USDT</span><span class="change" id="chartChange">—</span><small id="chartSync">منتظر دادهٔ زنده از Binance</small></div>
+            <div class="chart-wrap"><div class="chart-y-labels"><span>۶۸,۰۰۰</span><span>۶۷,۵۰۰</span><span>۶۷,۰۰۰</span><span>۶۶,۵۰۰</span></div><svg class="price-chart" viewBox="0 0 760 220" preserveAspectRatio="none" role="img" aria-label="نمودار تغییرات قیمت بیت‌کوین"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#5de0b4" stop-opacity=".21"/><stop offset="100%" stop-color="#5de0b4" stop-opacity="0"/></linearGradient></defs><g class="grid-lines"><path d="M0 25H760M0 75H760M0 125H760M0 175H760"/></g><path class="area-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22 L760 220H0Z" fill="url(#area)"/><path class="line-path" d="M0 163 C24 160 31 142 51 151 S77 166 96 132 122 149 145 119 171 126 191 111 217 139 240 108 269 114 291 81 318 102 338 89 360 112 383 73 410 88 429 77 454 95 478 56 502 78 521 59 548 84 568 53 592 63 612 41 640 61 660 31 681 50 703 22 725 33 744 14 760 22" fill="none" stroke="#66e5ba" stroke-width="2.6" vector-effect="non-scaling-stroke"/><circle cx="744" cy="14" r="4" fill="#09131b" stroke="#6ce9be" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="chart-x-labels"><span>۶۰ ثانیه</span><span>۵۰ ثانیه</span><span>۴۰ ثانیه</span><span>۳۰ ثانیه</span><span>۲۰ ثانیه</span><span>۱۰ ثانیه</span><span>اکنون</span></div></div>
             <div class="chart-footer"><span><i class="legend-dot"></i> قیمت بیت‌کوین</span><span>داده‌ها نمایشی هستند <b>ⓘ</b></span></div>
           </article>
 
-          <article class="panel ai-panel"><div class="ai-top"><div class="ai-heading"><span class="ai-icon">✳</span><div><b>بینش XsayaTrade AI</b><small>تحلیل هوشمند بازار</small></div></div><span class="live-pill"><i></i> نمونه</span></div><div class="signal-label">سیگنال فعلی <span>BTC / USDT</span></div><div class="signal-main"><div><strong>تمایل به خرید</strong><p>مومنتوم صعودی در حال تقویت است</p></div><div class="signal-gauge"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="25"/><circle class="gauge-progress" cx="32" cy="32" r="25"/></svg><b>۷۸<small>٪</small></b></div></div><div class="signal-divider"></div><div class="insight"><span class="insight-icon">↗</span><p>حجم معاملات در ۴ ساعت گذشته <b>۱۲٪ افزایش</b> داشته است. حمایت بعدی در <b>۶۶,۸۰۰ USDT</b> قرار دارد.</p></div><button class="ai-button" id="openAiAnalysis">مشاهده تحلیل کامل <span>←</span></button><div class="ai-disclaimer">این تحلیل توصیه مالی نیست.</div></article>
+          <article class="panel ai-panel"><div class="ai-top"><div class="ai-heading"><span class="ai-icon">✳</span><div><b>ردیاب الگو</b><small>تحلیل قاعده‌محور دادهٔ زنده</small></div></div><span class="live-pill" id="patternState"><i></i> در انتظار</span></div><div class="signal-label">الگوی کوتاه‌مدت <span id="patternPair">BTC / USDT</span></div><div class="signal-main"><div><strong id="patternLabel">در حال جمع‌آوری تاریخچه</strong><p id="patternDetail">پس از دریافت دادهٔ کافی، الگوها نمایش داده می‌شوند.</p></div><div class="signal-gauge"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="25"/><circle class="gauge-progress" id="patternGauge" cx="32" cy="32" r="25"/></svg><b id="patternStrength">—<small></small></b></div></div><div class="signal-divider"></div><div class="insight"><span class="insight-icon">⌁</span><p id="patternInsight">نوسان، میانگین‌های متحرک و شکست بازه بررسی می‌شوند؛ این بخش سیگنال خرید یا فروش نیست.</p></div><button class="ai-button" id="openAiAnalysis">روش تشخیص الگو <span>←</span></button><div class="ai-disclaimer">تشخیص قاعده‌محور؛ غیرقطعی و بدون توصیهٔ مالی.</div></article>
+        </section>
+
+        <section class="panel live-scanner-panel" id="marketScanner" aria-labelledby="scannerTitle">
+          <div class="scanner-header">
+            <div><div class="panel-kicker">Binance Spot · WebSocket</div><div class="panel-title" id="scannerTitle">اسکنر زندهٔ بازار</div><small id="scannerConnectionNote">آماده‌سازی اتصال؛ فقط دادهٔ واقعی نمایش داده می‌شود.</small></div>
+            <div class="scanner-statuses"><span class="scanner-live-pill" id="scannerLiveState"><i></i> در حال اتصال</span><span class="scanner-sync-pill">⟳ هر ۱ ثانیه</span></div>
+          </div>
+          <div class="scanner-stats">
+            <article><span>قیمت زندهٔ BTC / USDT</span><b id="scannerBtcPrice">—</b><small id="scannerBtcMeta">منتظر تیک Binance</small></article>
+            <article><span>بازارهای پایش‌شده</span><b id="scannedMarketsCount">۰ / ۱۰۰</b><small>بازارهای Spot با بیشترین حجم USDT</small></article>
+            <article class="anomaly-stat"><span>هشدار کیفیت / ناهنجاری</span><b id="priceAnomalyCount">—</b><small id="lastSyncTime">بدون دادهٔ دریافت‌شده</small></article>
+          </div>
+          <div class="scanner-toolbar"><label class="scanner-search"><span>⌕</span><input id="scannerSearch" type="search" placeholder="جستجوی نماد، مثل ETH یا BTC" autocomplete="off" /></label><div class="scanner-pagination"><button id="scannerPrev" type="button" disabled aria-label="صفحه قبل">‹</button><span id="scannerPageLabel">۰ / ۰</span><button id="scannerNext" type="button" disabled aria-label="صفحه بعد">›</button></div></div>
+          <div class="scanner-table-scroll"><table class="scanner-table"><thead><tr><th>#</th><th>بازار</th><th>قیمت آخر</th><th>تغییر ۲۴س</th><th>اسپرد</th><th>الگوی کوتاه‌مدت</th><th>کیفیت داده</th></tr></thead><tbody id="liveMarketRows"><tr><td colspan="7" class="scanner-empty">برای نمایش دادهٔ زنده، سرور باید به Binance دسترسی WebSocket داشته باشد.</td></tr></tbody></table></div>
+          <div class="scanner-foot"><span><i class="legend-dot"></i> داده از Binance Spot؛ همگام‌سازی سرور به سرور</span><span>الگوها قاعده‌محورند و توصیهٔ مالی نیستند</span></div>
         </section>
 
         <section class="bottom-layout">
-          <article class="panel markets-panel" id="markets"><div class="section-head"><div><div class="panel-title">بازارهای محبوب</div><small>قیمت‌ها بر اساس حساب آزمایشی</small></div><button class="text-link" id="allMarkets">مشاهده همه <span>←</span></button></div><div class="market-table"><div class="table-head"><span>دارایی</span><span>قیمت</span><span>تغییر ۲۴س</span><span>عملیات</span></div>
-            <div class="market-row" data-asset="btc"><div class="asset-name"><span class="coin-icon btc">₿</span><span><b>بیت‌کوین</b><small>BTC / USDT</small></span></div><b>۶۷,۴۲۸٫۵۰</b><span class="change positive">+۲.۸۴٪</span><button class="trade-link" data-trade="buy" data-name="بیت‌کوین">خرید</button></div>
-            <div class="market-row" data-asset="eth"><div class="asset-name"><span class="coin-icon eth">◆</span><span><b>اتریوم</b><small>ETH / USDT</small></span></div><b>۳,۵۲۱٫۱۸</b><span class="change negative">−۰.۶۲٪</span><button class="trade-link" data-trade="buy" data-name="اتریوم">خرید</button></div>
-            <div class="market-row" data-asset="gold"><div class="asset-name"><span class="coin-icon gold">Au</span><span><b>طلای ۱۸ عیار</b><small>GOLD / IRR</small></span></div><b>۳,۴۸۲,۰۰۰</b><span class="change positive">+۱.۱۲٪</span><button class="trade-link" data-trade="buy" data-name="طلای ۱۸ عیار">خرید</button></div>
-            <div class="market-row" data-asset="sol"><div class="asset-name"><span class="coin-icon sol">◎</span><span><b>سولانا</b><small>SOL / USDT</small></span></div><b>۱۸۲٫۴۰</b><span class="change positive">+۵.۲۱٪</span><button class="trade-link" data-trade="buy" data-name="سولانا">خرید</button></div>
+          <article class="panel markets-panel" id="markets"><div class="section-head"><div><div class="panel-title">بازارهای محبوب</div><small>قیمت رمزارزها از اسکن زندهٔ Binance · طلا در این فید نیست</small></div><button class="text-link" id="allMarkets">مشاهده همه <span>←</span></button></div><div class="market-table"><div class="table-head"><span>دارایی</span><span>قیمت</span><span>تغییر ۲۴س</span><span>عملیات</span></div>
+            <div class="market-row" data-asset="btc"><div class="asset-name"><span class="coin-icon btc">₿</span><span><b>بیت‌کوین</b><small>BTC / USDT</small></span></div><b>—</b><span class="change">—</span><button class="trade-link" data-trade="buy" data-name="بیت‌کوین">خرید</button></div>
+            <div class="market-row" data-asset="eth"><div class="asset-name"><span class="coin-icon eth">◆</span><span><b>اتریوم</b><small>ETH / USDT</small></span></div><b>—</b><span class="change">—</span><button class="trade-link" data-trade="buy" data-name="اتریوم">خرید</button></div>
+            <div class="market-row" data-asset="gold"><div class="asset-name"><span class="coin-icon gold">Au</span><span><b>طلای ۱۸ عیار</b><small>GOLD / IRR</small></span></div><b>—</b><span class="change">—</span><button class="trade-link" data-trade="buy" data-name="طلای ۱۸ عیار">خرید</button></div>
+            <div class="market-row" data-asset="sol"><div class="asset-name"><span class="coin-icon sol">◎</span><span><b>سولانا</b><small>SOL / USDT</small></span></div><b>—</b><span class="change">—</span><button class="trade-link" data-trade="buy" data-name="سولانا">خرید</button></div>
           </div></article>
 
           <article class="panel bot-panel"><div class="section-head bot-heading"><div><div class="panel-title">معامله‌گر خودکار</div><small>مدیریت هوشمند معاملات</small></div><button class="settings-mini" id="botSettings" aria-label="تنظیمات معامله‌گر">⚙</button></div><div class="bot-status"><span class="bot-orb"><span>✳</span></span><div><b id="botStatusTitle">ربات غیرفعال است</b><small id="botStatusDetail">کنترل معامله در دست شماست</small></div><button class="switch" id="botToggle" role="switch" aria-checked="false" aria-label="فعال‌سازی معامله‌گر خودکار"><i></i></button></div><div class="bot-mode"><span>حالت معامله</span><div class="segmented"><button id="manualMode" class="selected">دستی</button><button id="autoMode">خودکار</button></div></div><div class="risk-row"><span>سطح ریسک</span><div class="risk-options"><button data-risk="کم" class="selected">کم</button><button data-risk="متوسط">متوسط</button><button data-risk="زیاد">زیاد</button></div></div><div class="bot-foot"><span class="lock-icon">▣</span> فعال‌سازی ربات نیازمند بک‌اند امن است <button id="botInfo">ⓘ</button></div></article>
@@ -89,10 +105,11 @@
     </main>
   </div>
 
-  <nav class="mobile-nav"><a class="active" href="#overview"><span>▦</span>خانه</a><a href="#markets"><span>⌁</span>بازار</a><a href="#portfolio"><span>◫</span>دارایی</a><button id="mobileTrade"><span>＋</span>معامله</button><a href="#activity"><span>◷</span>فعالیت</a></nav>
+  <nav class="mobile-nav"><a class="active" href="#overview"><span>▦</span>خانه</a><a href="#marketScanner"><span>⌁</span>اسکن</a><a href="#portfolio"><span>◫</span>دارایی</a><button id="mobileTrade"><span>＋</span>معامله</button><a href="#activity"><span>◷</span>فعالیت</a></nav>
   <div class="toast" id="toast" role="status"></div>
   <div class="modal-backdrop" id="modalBackdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="بستن">×</button><div id="modalContent"></div></section></div>
   <script src="./i18n.js"></script>
   <script src="./app.js"></script>
+  <script src="./market-scanner.js"></script>
 </body>
 </html>

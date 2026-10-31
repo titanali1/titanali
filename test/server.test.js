@@ -47,7 +47,8 @@ test('secure API uses sessions, CSRF, encrypted-vault config and fail-closed tra
     XSAYATRADE_MASTER_KEY: randomBytes(32).toString('hex'),
     XSAYATRADE_DATA_DIR: dataDir,
     XSAYATRADE_ENABLE_EXCHANGE_CONNECTIONS: 'false',
-    XSAYATRADE_LIVE_TRADING: 'false'
+    XSAYATRADE_LIVE_TRADING: 'false',
+    XSAYATRADE_MARKET_DATA_ENABLED: 'false'
   };
   child = spawn(process.execPath, ['server.js'], { cwd: process.cwd(), env: backendEnv, stdio: 'ignore' });
   t.after(async () => {
@@ -68,6 +69,12 @@ test('secure API uses sessions, CSRF, encrypted-vault config and fail-closed tra
 
   const health = await (await api('/api/health')).json();
   assert.deepEqual(health, { ok: true, exchangeConnectionsEnabled: false, tradingEnabled: false, liveTradingEnabled: false });
+  const scanner = await (await api('/api/market/scanner')).json();
+  assert.equal(scanner.status, 'disabled', 'the market scanner can be disabled in isolated deployments/tests');
+  assert.equal(scanner.marketCount, 0);
+  const streamResponse = await api('/api/market/stream');
+  assert.equal(streamResponse.headers.get('content-type'), 'text/event-stream; charset=utf-8');
+  assert.match(await streamResponse.text(), /"status":"disabled"/);
   const providers = await (await api('/api/providers')).json();
   assert.ok(Array.isArray(providers.providers));
   assert.ok(providers.providers.every(provider => typeof provider.supported === 'boolean'));

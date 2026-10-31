@@ -47,9 +47,13 @@ XSAYATRADE_LIVE_TRADING=false
 XSAYATRADE_ALLOWED_EXCHANGES=binance,okx,kucoin,nobitex,wallex,bitpin
 XSAYATRADE_ORDER_QUOTE_LIMITS={"USDT":100}
 XSAYATRADE_MAX_LIMIT_DEVIATION_PERCENT=2
+XSAYATRADE_MARKET_DATA_ENABLED=true
+XSAYATRADE_MARKET_SCAN_LIMIT=100
 ```
 
 - `PORT` را خودتان تعیین نکنید؛ مقدار تخصیص‌یافته را cPanel/Passenger فراهم می‌کند.
+- برای دادهٔ زنده، خروجی سرور هاست باید به `https://api.binance.com` و `wss://stream.binance.com:443` باز باشد. اگر هاست دسترسی WebSocket خروجی را می‌بندد یا Binance از محل دیتاسنتر پاسخ نمی‌دهد، وضعیت اسکنر «قطع/تلاش مجدد» می‌ماند و قیمت ساختگی نشان نمی‌دهد.
+- اسکنر به‌صورت پیش‌فرض ۱۰۰ بازار فعال Spot با جفت USDT را هم‌زمان می‌پاید؛ مقدار قابل تنظیم ۵۱ تا ۲۰۰ است. BTC از جریان عمومی `@ticker` با به‌روزرسانی هدفِ هر ۱ ثانیه دریافت می‌شود و API key صرافی لازم ندارد.
 - `XSAYATRADE_DATA_DIR` باید خارج از `public_html` و خارج از پوشهٔ قابل‌دانلود برنامه باشد. پوشه را برای کاربر cPanel قابل‌نوشتن و با مجوز `0700` نگه دارید.
 - در cPanel Terminal می‌توانید کلید اصلی بسازید: `openssl rand -hex 32`. آن را امن پشتیبان‌گیری کنید؛ بدون همان کلید، Vault رمزگذاری‌شده قابل بازیابی نیست.
 - بعد از اولین راه‌اندازی و ایجاد حساب مدیر، مقدار `XSAYATRADE_ADMIN_PASSWORD` را از متغیرهای برنامه پاک کنید. گذرواژهٔ مدیر را بعداً از پنل مدیریت اپ تغییر دهید.

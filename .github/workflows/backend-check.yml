@@ -4,6 +4,14 @@ on:
   push:
     paths:
       - 'server.js'
+      - 'market-data.js'
+      - 'market-analysis.js'
+      - 'market-scanner.js'
+      - 'market-scanner.css'
+      - 'index.html'
+      - 'app.js'
+      - '.env.example'
+      - 'cpanel/**'
       - 'package.json'
       - 'package-lock.json'
       - 'test/**'
@@ -11,6 +19,14 @@ on:
   pull_request:
     paths:
       - 'server.js'
+      - 'market-data.js'
+      - 'market-analysis.js'
+      - 'market-scanner.js'
+      - 'market-scanner.css'
+      - 'index.html'
+      - 'app.js'
+      - '.env.example'
+      - 'cpanel/**'
       - 'package.json'
       - 'package-lock.json'
       - 'test/**'

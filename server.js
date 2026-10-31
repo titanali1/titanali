@@ -2,6 +2,7 @@ import http from 'node:http';
 import { createReadStream, existsSync, renameSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BinanceMarketFeed } from './market-data.js';
 import {
   createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, scryptSync,
   timingSafeEqual, randomUUID
@@ -49,6 +50,8 @@ for (const origin of manageableOrigins) allowedHosts.add(new URL(origin).host.to
 let activeOrigin = null;
 let activeHost = null;
 let adminRecord = null;
+const marketDataEnabled = process.env.XSAYATRADE_MARKET_DATA_ENABLED !== 'false';
+const marketFeed = new BinanceMarketFeed({ enabled: marketDataEnabled });
 
 function parseOrderLimits(raw) {
   try {
@@ -370,6 +373,22 @@ const server = http.createServer(async (req, res) => {
   catch { json(res, 400, { message: 'Invalid URL.' }); return; }
 
   try {
+    if (req.method === 'GET' && url.pathname === '/api/market/scanner') {
+      if (marketDataEnabled && !marketFeed.running) marketFeed.start();
+      json(res, 200, marketFeed.getSnapshot());
+      return;
+    }
+    if (req.method === 'GET' && url.pathname === '/api/market/stream') {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no'
+      });
+      res.flushHeaders?.();
+      marketFeed.subscribe(res);
+      return;
+    }
     if (req.method === 'GET' && url.pathname === '/api/providers') {
       const module = await getCCXT();
       const providers = [...allowedExchanges].map(id => {
@@ -674,6 +693,8 @@ initializeAdminAndSettings().then(() => {
     console.log(`Admin account: ${adminRecord.username} (password stored as scrypt hash)`);
     console.log(`Exchange connection: ${connectionsEnabled ? 'enabled (CCXT verification required)' : 'disabled'}`);
     console.log(`Live orders: ${liveTradingEnabled ? 'enabled with strict spot/limit controls' : 'disabled (default)'}`);
+    if (marketDataEnabled) marketFeed.start();
+    console.log(`Binance market feed: ${marketDataEnabled ? `enabled (${marketFeed.marketLimit} USDT spot markets)` : 'disabled'}`);
   });
 }).catch(error => {
   console.error('XsayaTrade startup configuration error:', error.message);
